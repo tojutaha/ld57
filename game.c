@@ -4,11 +4,11 @@
 function void
 InitGame(GameState *gamestate)
 {
-    gamestate->window_width = 800;
-    gamestate->window_height = 600;
+    gamestate->screen_width = 800;
+    gamestate->screen_height = 600;
 
     SetConfigFlags(FLAG_VSYNC_HINT|FLAG_MSAA_4X_HINT);
-    InitWindow(gamestate->window_width, gamestate->window_height, "LD57");
+    InitWindow(gamestate->screen_width, gamestate->screen_height, "LD57");
     SetTargetFPS(TARGET_FPS);
 
     InitAudioDevice();
@@ -112,7 +112,7 @@ UpdateGame(GameState *gamestate, f32 dt)
     f32 min_effect = 20;
     f32 fraction_speed = 1.6f;
 
-    gamestate->camera.offset = (v2){ gamestate->window_width*0.5f, gamestate->window_height*0.5f };
+    gamestate->camera.offset = (v2){ gamestate->screen_width*0.5f, gamestate->screen_height*0.5f };
     v2 diff = Vector2Subtract(player->pos, gamestate->camera.target);
     f32 effect_len = Vector2Length(diff);
     if(effect_len > min_effect)

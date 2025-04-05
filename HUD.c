@@ -25,6 +25,6 @@ DrawCameraFade(GameState *gamestate)
     {
         Color color = BLACK;
         color.a = (u8)(gamestate->fade_alpha * 255);
-        DrawRectangle(0, 0, gamestate->window_width, gamestate->window_height, color);
+        DrawRectangle(0, 0, gamestate->screen_width, gamestate->screen_height, color);
     }
 }

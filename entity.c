@@ -12,7 +12,7 @@ AddPlayer(GameState *gamestate)
         .frame_counter = 0,
     };
 
-    v2 start_pos = { gamestate->window_width / 2.0f, gamestate->window_height / 2.0f };
+    v2 start_pos = { gamestate->screen_width / 2.0f, gamestate->screen_height / 2.0f };
     Entity player = { sprite, start_pos, Vector2Zero(), 2000, Player, Left, CollisionFlag_Overlap };
     sprite.pos = player.pos;
 
@@ -27,7 +27,7 @@ AddPlayer(GameState *gamestate)
 function void
 ResetPlayerPos(GameState *gamestate)
 {
-    v2 start_pos = { gamestate->window_width / 2.0f, gamestate->window_height / 2.0f };
+    v2 start_pos = { gamestate->screen_width / 2.0f, gamestate->screen_height / 2.0f };
     gamestate->player.pos = start_pos;
     gamestate->player.sprite.pos = gamestate->player.pos;
 }
