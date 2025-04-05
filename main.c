@@ -11,6 +11,7 @@ typedef double f64;
 typedef Vector2 v2;
 typedef int32_t b32;
 #define function static
+#define global static
 
 #define MAP_HEIGHT 12
 #define MAP_WIDTH 12
@@ -19,19 +20,26 @@ typedef int32_t b32;
 
 #define MAX_ENTITIES 100
 #define ENTITY_MAX_VELOCITY 200
-#define PLAYER_SIZE 32
+
+#define PLAYER_WIDTH 32
+#define PLAYER_HEIGHT 64
+
 #define PRESSURE_PLATE_SIZE 64
+
+//
+// Gamestate
+//
 
 typedef struct
 {
     u32 level;
 } GameState;
 
-typedef enum
-{
-    Axis_X,
-    Axis_Y,
-} Axis;
+global GameState gamestate; // TODO: Global for now..
+
+//
+// Entities
+//
 
 typedef enum
 {
@@ -82,6 +90,11 @@ typedef struct
     b32 pressure_plate_active;
 
 } Entity;
+
+
+//
+// Tilemap
+//
 
 typedef struct
 {
@@ -150,7 +163,7 @@ DrawMapAndEntities(Tilemap *map)
                 if(map->pressure_plate_count <= 0)
                 {
                     map->door_open = true;
-                    e->collision_flag = CollisionFlag_None;
+                    e->collision_flag = CollisionFlag_Overlap;
                 }
 
                 Color color = map->door_open ? GOLD : DARKGREEN;
@@ -169,6 +182,41 @@ DrawMapAndEntities(Tilemap *map)
     }
 }
 
+function void
+AddPressurePlate(Tilemap *map, s32 x, s32 y)
+{
+    Entity e =
+    {
+        // .pos = (v2){ x * TILE_WIDTH + PRESSURE_PLATE_SIZE * 0.5f, y * TILE_HEIGHT + PRESSURE_PLATE_SIZE * 0.5f},
+        .pos = (v2){ x * TILE_WIDTH + PRESSURE_PLATE_SIZE, y * TILE_HEIGHT + PRESSURE_PLATE_SIZE },
+        .vel = Vector2Zero(),
+        .speed = 0,
+        .type = PressurePlate,
+        .collision_flag = CollisionFlag_Overlap,
+        .pressure_plate_active = false,
+    };
+
+    map->entities[map->entity_count++] = e;
+    map->pressure_plate_count++;
+}
+
+function void
+IncrementLevel()
+{
+    printf("NOT IMPLEMENTED!\n");
+    gamestate.level++;
+}
+
+//
+// Collision
+//
+
+typedef enum
+{
+    Axis_X,
+    Axis_Y,
+} Axis;
+
 typedef struct
 {
     Entity *collided_entity;
@@ -183,9 +231,9 @@ CheckCollision(Tilemap *map, Entity *player, v2 *velocity, Axis axis)
     Rectangle player_rect =
     {
         player->pos.x,
-        player->pos.y,
-        PLAYER_SIZE,
-        PLAYER_SIZE
+        player->pos.y + PLAYER_WIDTH,
+        PLAYER_WIDTH,
+        PLAYER_HEIGHT*0.5
     };
 
     CollisionResult result = {0};
@@ -307,19 +355,25 @@ HandleOverlappingCollision(Tilemap *map, Entity *e)
                 {
                     e->pressure_plate_active = true;
                     map->pressure_plate_count--;
-                    // e->collision_flag = CollisionFlag_None;
+                    e->collision_flag = CollisionFlag_None;
                 }
             } break;
 
             case Door:
             {
-                printf("Collided with door\n");
+                e->collision_flag = CollisionFlag_None;
+                IncrementLevel();
+
             } break;
 
             default: break;
         }
     }
 }
+
+//
+//
+//
 
 function void
 UpdatePlayer(Tilemap *map, Entity *player, Camera2D *camera, f32 dt)
@@ -399,24 +453,6 @@ UpdatePlayer(Tilemap *map, Entity *player, Camera2D *camera, f32 dt)
     camera->target = player->pos;
 }
 
-function void
-AddPressurePlate(Tilemap *map, s32 x, s32 y)
-{
-    Entity e =
-    {
-        // .pos = (v2){ x * TILE_WIDTH + PRESSURE_PLATE_SIZE * 0.5f, y * TILE_HEIGHT + PRESSURE_PLATE_SIZE * 0.5f},
-        .pos = (v2){ x * TILE_WIDTH + PRESSURE_PLATE_SIZE, y * TILE_HEIGHT + PRESSURE_PLATE_SIZE },
-        .vel = Vector2Zero(),
-        .speed = 0,
-        .type = PressurePlate,
-        .collision_flag = CollisionFlag_Overlap,
-        .pressure_plate_active = false,
-    };
-
-    map->entities[map->entity_count++] = e;
-    map->pressure_plate_count++;
-}
-
 int main(void)
 {
     s32 window_width = 800;
@@ -440,15 +476,20 @@ int main(void)
     AddPressurePlate(&map, 2, 2);
     AddPressurePlate(&map, 3, 3);
 
-    GameState gamestate;
     gamestate.level = 1;
 
     while(!WindowShouldClose())
     {
+        //
+        // Update
+        //
         f32 dt = GetFrameTime();
-        dt = Clamp(dt, dt, 1.0f/30.0f);
 
         UpdatePlayer(&map, &player, &camera, dt);
+
+        //
+        // Render
+        //
 
         BeginDrawing();
         ClearBackground(BLACK);
@@ -456,8 +497,7 @@ int main(void)
 
         DrawMapAndEntities(&map);
 
-        DrawRectangleV(player.pos, (v2){ 32, 32 }, BLUE);
-
+        DrawRectangleV(player.pos, (v2){ PLAYER_WIDTH, PLAYER_HEIGHT }, BLUE);
         EndMode2D();
 
         DrawText(TextFormat("LEVEL: %d", gamestate.level), 20, 20, 20, GREEN);
