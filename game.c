@@ -2,7 +2,7 @@
 #include "root.h"
 
 function void
-InitGame(GameState *gamestate, Tilemap *map)
+InitGame(GameState *gamestate)
 {
     gamestate->window_width = 800;
     gamestate->window_height = 600;
@@ -16,19 +16,20 @@ InitGame(GameState *gamestate, Tilemap *map)
     gamestate->texture_atlas = LoadTexture("./resources/spritesheet.png");
     gamestate->level_num = 1;
 
-    InitTilemap(map);
+    InitTilemap(&gamestate->current_map);
 
-    AddPressurePlate(map, 1, 1);
-    AddPressurePlate(map, 2, 2);
-    AddPressurePlate(map, 3, 3);
+    AddPressurePlate(&gamestate->current_map, 1, 1);
+    AddPressurePlate(&gamestate->current_map, 2, 2);
+    AddPressurePlate(&gamestate->current_map, 3, 3);
 
     gamestate->player = AddPlayer(gamestate);
 }
 
 function void
-UpdateGame(GameState *gamestate, Tilemap *map, f32 dt)
+UpdateGame(GameState *gamestate, f32 dt)
 {
     Entity *player = &gamestate->player;
+    Tilemap *map = &gamestate->current_map;
 
     v2 movement_vector = {0};
 
@@ -130,12 +131,13 @@ RenderHUD(GameState *gamestate)
 }
 
 function void
-RenderGame(GameState *gamestate, Tilemap *map, f32 dt)
+RenderGame(GameState *gamestate, f32 dt)
 {
     BeginDrawing();
     ClearBackground(BLACK);
     BeginMode2D(gamestate->camera);
 
+    Tilemap *map = &gamestate->current_map;
     DrawMapAndEntities(map);
 
     AnimateEntity(&gamestate->player);

@@ -5,6 +5,8 @@ typedef struct
 {
     Entity player;
 
+    Tilemap current_map;
+
     Texture2D texture_atlas;
 
     Camera2D camera;

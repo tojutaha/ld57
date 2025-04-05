@@ -8,7 +8,6 @@
 #include <math.h>
 
 #define INTERNAL 1
-
 #define TARGET_FPS 60
 
 #include "types.h"
