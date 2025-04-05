@@ -135,7 +135,7 @@ RenderGame(GameState *gamestate, f32 dt)
     BeginMode2D(gamestate->camera);
 
     Tilemap *map = &gamestate->current_map;
-    DrawMapAndEntities(map);
+    DrawMapAndEntities(map, dt);
 
     AnimateEntity(&gamestate->player);
     DrawSprite(gamestate->texture_atlas, gamestate->player.sprite, PLAYER_WIDTH, PLAYER_HEIGHT);

@@ -53,6 +53,6 @@ typedef struct
     CollisionFlag collision_flag;
 
     b32 pressure_plate_active;
-
+    f32 alpha;
 } Entity;
 

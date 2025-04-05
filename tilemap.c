@@ -30,7 +30,7 @@ InitTilemap(Tilemap *map)
 }
 
 function void
-DrawMapAndEntities(Tilemap *map)
+DrawMapAndEntities(Tilemap *map, f32 dt)
 {
     for(u32 y = 0; y < MAP_HEIGHT; ++y)
     {
@@ -70,7 +70,28 @@ DrawMapAndEntities(Tilemap *map)
             case PressurePlate:
             {
                 Color color = e->pressure_plate_active ? RED : BLUE;
-                DrawRectangleV(e->pos, (v2){ PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE }, color);
+                v2 original_size = (v2){ PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
+                v2 size = original_size;
+                f32 speed = 8.0f;
+
+                if(e->pressure_plate_active)
+                {
+                    f32 shrink_amount = 6.0f;
+                    v2 target = (v2){ PRESSURE_PLATE_SIZE-shrink_amount, PRESSURE_PLATE_SIZE-shrink_amount };
+                    e->alpha += dt * speed;
+                    e->alpha = Clamp(e->alpha, 0.0f, 1.0f);
+                    size = Vector2Lerp(size, target, e->alpha);
+                }
+
+                v2 offset =
+                {
+                    (original_size.x - size.x) * 0.5f,
+                    (original_size.y - size.y) * 0.5f,
+                };
+
+                v2 draw_pos = Vector2Add(e->pos, offset);
+
+                DrawRectangleV(draw_pos, size, color);
             }
 
             default: break;
