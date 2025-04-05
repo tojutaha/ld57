@@ -18,6 +18,7 @@ InitGame(GameState *gamestate)
     SetupLevel(gamestate, gamestate->level_num);
 
     gamestate->player = AddPlayer(gamestate);
+    gamestate->player_can_move = true;
 }
 
 function void
@@ -28,10 +29,13 @@ UpdateGame(GameState *gamestate, f32 dt)
 
     v2 movement_vector = {0};
 
-    if(IsKeyDown(KEY_A)) movement_vector.x -= 1;
-    if(IsKeyDown(KEY_D)) movement_vector.x += 1;
-    if(IsKeyDown(KEY_W)) movement_vector.y -= 1;
-    if(IsKeyDown(KEY_S)) movement_vector.y += 1;
+    if(gamestate->player_can_move)
+    {
+        if(IsKeyDown(KEY_A)) movement_vector.x -= 1;
+        if(IsKeyDown(KEY_D)) movement_vector.x += 1;
+        if(IsKeyDown(KEY_W)) movement_vector.y -= 1;
+        if(IsKeyDown(KEY_S)) movement_vector.y += 1;
+    }
 
     f32 len = Vector2LengthSqr(movement_vector);
     if(len > 0)

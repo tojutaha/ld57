@@ -28,3 +28,15 @@ DrawCameraFade(GameState *gamestate)
         DrawRectangle(0, 0, gamestate->screen_width, gamestate->screen_height, color);
     }
 }
+
+function void
+DrawMainMenu(GameState *gamestate)
+{
+    Assert(!"NOT IMPLEMENTED");
+}
+
+function void
+DrawPauseMenu(GameState *gamestate)
+{
+    Assert(!"NOT IMPLEMENTED");
+}

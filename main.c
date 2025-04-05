@@ -22,12 +22,12 @@ int main(void)
 
             case GameMode_MainMenu:
             {
-                Assert(!"NOT IMPLEMENTED");
+                DrawMainMenu(gamestate);
             } break;
 
             case GameMode_PauseMenu:
             {
-                Assert(!"NOT IMPLEMENTED");
+                DrawPauseMenu(gamestate);
             } break;
         }
 
