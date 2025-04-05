@@ -110,7 +110,21 @@ UpdateGame(GameState *gamestate, f32 dt)
     }
 
     player->sprite.pos = player->pos;
-    gamestate->camera.target = player->pos;
+
+    // Update camera
+    // gamestate->camera.target = player->pos;
+    f32 min_speed = 20.0f;
+    f32 min_effect = 20;
+    f32 fraction_speed = 1.8f;
+
+    gamestate->camera.offset = (v2){ gamestate->window_width*0.5f, gamestate->window_height*0.5f };
+    v2 diff = Vector2Subtract(player->pos, gamestate->camera.target);
+    f32 effect_len = Vector2Length(diff);
+    if(effect_len > min_effect)
+    {
+        f32 speed = fmaxf(fraction_speed*effect_len, min_speed);
+        gamestate->camera.target = Vector2Add(gamestate->camera.target, Vector2Scale(diff, speed*dt/effect_len));
+    }
 }
 
 function void
