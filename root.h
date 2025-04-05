@@ -11,12 +11,6 @@
 
 #define TARGET_FPS 60
 
-#define PLAYER_WIDTH 32
-#define PLAYER_HEIGHT 64
-
-#define PRESSURE_PLATE_SIZE 64
-
-
 #include "types.h"
 #include "sprite.h"
 #include "entity.h"

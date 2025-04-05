@@ -6,6 +6,8 @@
 #define TILE_WIDTH 64
 #define TILE_HEIGHT 64
 
+#define PRESSURE_PLATE_SIZE 64
+
 #define MAX_ENTITIES 100
 #define ENTITY_MAX_VELOCITY 200
 

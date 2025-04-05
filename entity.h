@@ -1,6 +1,9 @@
 #pragma once
 #include "root.h"
 
+#define PLAYER_WIDTH 32
+#define PLAYER_HEIGHT 64
+
 typedef enum
 {
     CollisionFlag_None    = 0,
