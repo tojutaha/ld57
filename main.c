@@ -12,14 +12,20 @@ typedef Vector2 v2;
 typedef int32_t b32;
 #define function static
 
-#define MAP_HEIGHT 10
-#define MAP_WIDTH 10
+#define MAP_HEIGHT 12
+#define MAP_WIDTH 12
 #define TILE_WIDTH 64
 #define TILE_HEIGHT 64
 
 #define MAX_ENTITIES 100
 #define ENTITY_MAX_VELOCITY 200
-#define ENTITY_SIZE 32
+#define PLAYER_SIZE 32
+#define PRESSURE_PLATE_SIZE 64
+
+typedef struct
+{
+    u32 level;
+} GameState;
 
 typedef enum
 {
@@ -37,6 +43,7 @@ typedef enum
 typedef enum
 {
     Player,
+    Door,
     Obstacle,
     PressurePlate,
 } EntityType;
@@ -47,6 +54,7 @@ PrettifyEntityType(EntityType type)
     switch(type)
     {
     case Player: return "Player";
+    case Door: return "Door";
     case Obstacle: return "Obstacle";
     case PressurePlate: return "PressurePlate";
     default: return "Unknown";
@@ -77,6 +85,9 @@ typedef struct
 
 typedef struct
 {
+    u32 pressure_plate_count;
+    b32 door_open;
+
     u32 entity_count;
     Entity entities[MAX_ENTITIES];
 } Tilemap;
@@ -84,12 +95,21 @@ typedef struct
 function void
 InitTilemap(Tilemap *map)
 {
+    map->door_open = false;
+
     for(u32 y = 0; y < MAP_HEIGHT; ++y)
     {
         for(u32 x = 0; x < MAP_WIDTH; ++x)
         {
             f32 tile_x = x * TILE_WIDTH;
             f32 tile_y = y * TILE_HEIGHT;
+
+            if(x == MAP_WIDTH/2 && y == 0)
+            {
+                Entity door = { (v2){tile_x, tile_y}, Vector2Zero(), 0, Door, Left, CollisionFlag_Block };
+                map->entities[map->entity_count++] = door;
+                continue;
+            }
 
             if(x == 0 || x == MAP_WIDTH-1 || y == 0 || y == MAP_HEIGHT-1)
             {
@@ -125,10 +145,23 @@ DrawMapAndEntities(Tilemap *map)
                 DrawRectangleV(e->pos, (v2){ TILE_WIDTH, TILE_HEIGHT }, DARKGREEN);
             } break;
 
+            case Door:
+            {
+                if(map->pressure_plate_count <= 0)
+                {
+                    map->door_open = true;
+                    e->collision_flag = CollisionFlag_None;
+                }
+
+                Color color = map->door_open ? GOLD : DARKGREEN;
+
+                DrawRectangleV(e->pos, (v2){ TILE_WIDTH, TILE_HEIGHT }, color);
+            } break;
+
             case PressurePlate:
             {
                 Color color = e->pressure_plate_active ? RED : BLUE;
-                DrawRectangleV(e->pos, (v2){ ENTITY_SIZE, ENTITY_SIZE }, color);
+                DrawRectangleV(e->pos, (v2){ PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE }, color);
             }
 
             default: break;
@@ -151,8 +184,8 @@ CheckCollision(Tilemap *map, Entity *player, v2 *velocity, Axis axis)
     {
         player->pos.x,
         player->pos.y,
-        ENTITY_SIZE,
-        ENTITY_SIZE
+        PLAYER_SIZE,
+        PLAYER_SIZE
     };
 
     CollisionResult result = {0};
@@ -166,7 +199,7 @@ CheckCollision(Tilemap *map, Entity *player, v2 *velocity, Axis axis)
         {
             case PressurePlate:
             {
-                entity_rect = (Rectangle){ other->pos.x, other->pos.y, ENTITY_SIZE, ENTITY_SIZE };
+                entity_rect = (Rectangle){ other->pos.x, other->pos.y, PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
             } break;
 
             default:
@@ -260,6 +293,35 @@ CheckCollision(Tilemap *map, Entity *player, v2 *velocity, Axis axis)
 }
 
 function void
+HandleOverlappingCollision(Tilemap *map, Entity *e)
+{
+    if(e)
+    {
+        // printf("Overlapping collision with entity %s\n", PrettifyEntityType(e->type));
+
+        switch(e->type)
+        {
+            case PressurePlate:
+            {
+                if(!e->pressure_plate_active)
+                {
+                    e->pressure_plate_active = true;
+                    map->pressure_plate_count--;
+                    // e->collision_flag = CollisionFlag_None;
+                }
+            } break;
+
+            case Door:
+            {
+                printf("Collided with door\n");
+            } break;
+
+            default: break;
+        }
+    }
+}
+
+function void
 UpdatePlayer(Tilemap *map, Entity *player, Camera2D *camera, f32 dt)
 {
     v2 movement_vector = {0};
@@ -304,12 +366,14 @@ UpdatePlayer(Tilemap *map, Entity *player, Camera2D *camera, f32 dt)
     player->vel.x += movement_vector.x * dt;
     player->vel.y += movement_vector.y * dt;
 
+    // @Hack to avoid tunneling..
     player->pos.x += player_delta.x;
     CollisionResult collision_result_x = CheckCollision(map, player, &player->vel, Axis_X);
 
     player->pos.y += player_delta.y;
     CollisionResult collision_result_y = CheckCollision(map, player, &player->vel, Axis_Y);
 
+#if 0
     if(collision_result_x.blocking && collision_result_x.collided_entity)
     {
         printf("Blocking collision with entity %s\n", PrettifyEntityType(collision_result_x.collided_entity->type));
@@ -318,17 +382,39 @@ UpdatePlayer(Tilemap *map, Entity *player, Camera2D *camera, f32 dt)
     {
         printf("Blocking collision with entity %s\n", PrettifyEntityType(collision_result_y.collided_entity->type));
     }
+#endif
 
-    if(collision_result_x.overlapping && collision_result_x.collided_entity)
+    if(collision_result_x.overlapping)
     {
-        printf("Overlapping collision with entity %s\n", PrettifyEntityType(collision_result_x.collided_entity->type));
+        Entity *e = collision_result_x.collided_entity;
+        HandleOverlappingCollision(map, collision_result_x.collided_entity);
     }
-    if(collision_result_y.overlapping && collision_result_y.collided_entity)
+
+    if(collision_result_y.overlapping)
     {
-        printf("Overlapping collision with entity %s\n", PrettifyEntityType(collision_result_y.collided_entity->type));
+        Entity *e = collision_result_y.collided_entity;
+        HandleOverlappingCollision(map, collision_result_y.collided_entity);
     }
 
     camera->target = player->pos;
+}
+
+function void
+AddPressurePlate(Tilemap *map, s32 x, s32 y)
+{
+    Entity e =
+    {
+        // .pos = (v2){ x * TILE_WIDTH + PRESSURE_PLATE_SIZE * 0.5f, y * TILE_HEIGHT + PRESSURE_PLATE_SIZE * 0.5f},
+        .pos = (v2){ x * TILE_WIDTH + PRESSURE_PLATE_SIZE, y * TILE_HEIGHT + PRESSURE_PLATE_SIZE },
+        .vel = Vector2Zero(),
+        .speed = 0,
+        .type = PressurePlate,
+        .collision_flag = CollisionFlag_Overlap,
+        .pressure_plate_active = false,
+    };
+
+    map->entities[map->entity_count++] = e;
+    map->pressure_plate_count++;
 }
 
 int main(void)
@@ -350,8 +436,12 @@ int main(void)
     Tilemap map = {0};
     InitTilemap(&map);
 
-    Entity monster = { (v2){ TILE_WIDTH*1.25f, TILE_HEIGHT*1.25f }, Vector2Zero(), 1800, PressurePlate, Left, CollisionFlag_Overlap };
-    map.entities[map.entity_count++] = monster;
+    AddPressurePlate(&map, 1, 1);
+    AddPressurePlate(&map, 2, 2);
+    AddPressurePlate(&map, 3, 3);
+
+    GameState gamestate;
+    gamestate.level = 1;
 
     while(!WindowShouldClose())
     {
@@ -369,6 +459,9 @@ int main(void)
         DrawRectangleV(player.pos, (v2){ 32, 32 }, BLUE);
 
         EndMode2D();
+
+        DrawText(TextFormat("LEVEL: %d", gamestate.level), 20, 20, 20, GREEN);
+
         EndDrawing();
     }
 
