@@ -17,6 +17,7 @@
 #include "collision.h"
 #include "game.h"
 
+#include "HUD.c"
 #include "sprite.c"
 #include "entity.c"
 #include "tilemap.c"
