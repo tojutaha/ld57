@@ -13,6 +13,7 @@ typedef enum
 
 typedef enum
 {
+    None,
     Player,
     Door,
     Obstacle,

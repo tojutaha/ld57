@@ -2,34 +2,6 @@
 #include "root.h"
 
 function void
-InitTilemap(Tilemap *map)
-{
-    map->door_open = false;
-
-    for(u32 y = 0; y < MAP_HEIGHT; ++y)
-    {
-        for(u32 x = 0; x < MAP_WIDTH; ++x)
-        {
-            f32 tile_x = x * TILE_WIDTH;
-            f32 tile_y = y * TILE_HEIGHT;
-
-            if(x == MAP_WIDTH/2 && y == 0)
-            {
-                Entity door = { .pos = (v2){tile_x, tile_y}, Vector2Zero(), 0, Door, Left, CollisionFlag_Block };
-                map->entities[map->entity_count++] = door;
-                continue;
-            }
-
-            if(x == 0 || x == MAP_WIDTH-1 || y == 0 || y == MAP_HEIGHT-1)
-            {
-                Entity wall = { .pos = (v2){tile_x, tile_y}, Vector2Zero(), 0, Obstacle, Left, CollisionFlag_Block };
-                map->entities[map->entity_count++] = wall;
-            }
-        }
-    }
-}
-
-function void
 DrawMapAndEntities(Tilemap *map, f32 dt)
 {
     for(u32 y = 0; y < MAP_HEIGHT; ++y)
@@ -72,7 +44,7 @@ DrawMapAndEntities(Tilemap *map, f32 dt)
                 Color color = e->pressure_plate_active ? RED : BLUE;
                 v2 original_size = (v2){ PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
                 v2 size = original_size;
-                f32 speed = 8.0f;
+                f32 speed = 12.0f;
 
                 if(e->pressure_plate_active)
                 {
@@ -104,7 +76,6 @@ AddPressurePlate(Tilemap *map, s32 x, s32 y)
 {
     Entity e =
     {
-        // .pos = (v2){ x * TILE_WIDTH + PRESSURE_PLATE_SIZE * 0.5f, y * TILE_HEIGHT + PRESSURE_PLATE_SIZE * 0.5f},
         .pos = (v2){ x * TILE_WIDTH + PRESSURE_PLATE_SIZE, y * TILE_HEIGHT + PRESSURE_PLATE_SIZE },
         .vel = Vector2Zero(),
         .speed = 0,
@@ -118,8 +89,90 @@ AddPressurePlate(Tilemap *map, s32 x, s32 y)
 }
 
 function void
+InitTilemap(Tilemap *map)
+{
+    map->door_open = false;
+
+    for(u32 y = 0; y < MAP_HEIGHT; ++y)
+    {
+        for(u32 x = 0; x < MAP_WIDTH; ++x)
+        {
+            f32 tile_x = x * TILE_WIDTH;
+            f32 tile_y = y * TILE_HEIGHT;
+
+            if(x == MAP_WIDTH/2 && y == 0)
+            {
+                Entity door = { .pos = (v2){tile_x, tile_y}, Vector2Zero(), 0, Door, Left, CollisionFlag_Block };
+                map->entities[map->entity_count++] = door;
+                continue;
+            }
+
+            if(x == 0 || x == MAP_WIDTH-1 || y == 0 || y == MAP_HEIGHT-1)
+            {
+                Entity wall = { .pos = (v2){tile_x, tile_y}, Vector2Zero(), 0, Obstacle, Left, CollisionFlag_Block };
+                map->entities[map->entity_count++] = wall;
+            }
+        }
+    }
+}
+
+
+function void
+ResetTilemap(Tilemap *map)
+{
+    map->pressure_plate_count = 0;
+    memset(map->entities, 0, sizeof(Entity) * map->entity_count);
+    map->entity_count = 0;
+    map->door_open = false;
+}
+
+function void
+StartLevelFade(GameState *gamestate, u32 next_level)
+{
+    gamestate->fade_timer = 0;
+    gamestate->fade_duration = 0.5f;
+    gamestate->fade_in = false;
+    gamestate->is_fading = true;
+    gamestate->player_can_move = false;
+
+    gamestate->pending_level_increment = true;
+    gamestate->level_num = next_level;
+}
+
+function b32
+SetupLevel(GameState *gamestate, u32 level_num)
+{
+    ResetTilemap(&gamestate->current_map);
+    InitTilemap(&gamestate->current_map);
+
+    switch(level_num)
+    {
+        case 0:
+        {
+            // Default first level
+            AddPressurePlate(&gamestate->current_map, 1, 1);
+
+            return true;
+        }
+
+        case 1:
+        {
+            // Little variation for next level
+            AddPressurePlate(&gamestate->current_map, 1, 1);
+            AddPressurePlate(&gamestate->current_map, 2, 2);
+            AddPressurePlate(&gamestate->current_map, 3, 3);
+
+            return true;
+        }
+
+        // TODO: Implement more levels
+
+        default: return false;
+    }
+}
+
+function void
 IncrementLevel(GameState *gamestate)
 {
-    printf("NOT IMPLEMENTED!\n");
-    gamestate->level_num++;
+    StartLevelFade(gamestate, gamestate->level_num + 1);
 }

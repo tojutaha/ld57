@@ -18,3 +18,13 @@ RenderHUD(GameState *gamestate)
 #endif
 }
 
+function void
+DrawCameraFade(GameState *gamestate)
+{
+    if(gamestate->is_fading || gamestate->fade_alpha > 0.0f)
+    {
+        Color color = BLACK;
+        color.a = (u8)(gamestate->fade_alpha * 255);
+        DrawRectangle(0, 0, gamestate->window_width, gamestate->window_height, color);
+    }
+}

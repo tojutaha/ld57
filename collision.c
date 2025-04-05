@@ -138,6 +138,7 @@ HandleOverlappingCollision(GameState *gamestate, Tilemap *map, Entity *e)
             case Door:
             {
                 e->collision_flag = CollisionFlag_None;
+                e->type = None;
                 IncrementLevel(gamestate);
 
             } break;

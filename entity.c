@@ -25,6 +25,14 @@ AddPlayer(GameState *gamestate)
 }
 
 function void
+ResetPlayerPos(GameState *gamestate)
+{
+    v2 start_pos = { gamestate->window_width / 2.0f, gamestate->window_height / 2.0f };
+    gamestate->player.pos = start_pos;
+    gamestate->player.sprite.pos = gamestate->player.pos;
+}
+
+function void
 AnimateEntity(Entity *e)
 {
     f32 anim_speed = 3.0f;

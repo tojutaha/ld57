@@ -14,13 +14,8 @@ InitGame(GameState *gamestate)
     InitAudioDevice();
 
     gamestate->texture_atlas = LoadTexture("./resources/spritesheet.png");
-    gamestate->level_num = 1;
-
-    InitTilemap(&gamestate->current_map);
-
-    AddPressurePlate(&gamestate->current_map, 1, 1);
-    AddPressurePlate(&gamestate->current_map, 2, 2);
-    AddPressurePlate(&gamestate->current_map, 3, 3);
+    gamestate->level_num = 0;
+    SetupLevel(gamestate, gamestate->level_num);
 
     gamestate->player = AddPlayer(gamestate);
 }
@@ -115,7 +110,7 @@ UpdateGame(GameState *gamestate, f32 dt)
     // gamestate->camera.target = player->pos;
     f32 min_speed = 20.0f;
     f32 min_effect = 20;
-    f32 fraction_speed = 1.8f;
+    f32 fraction_speed = 1.6f;
 
     gamestate->camera.offset = (v2){ gamestate->window_width*0.5f, gamestate->window_height*0.5f };
     v2 diff = Vector2Subtract(player->pos, gamestate->camera.target);
@@ -124,6 +119,46 @@ UpdateGame(GameState *gamestate, f32 dt)
     {
         f32 speed = fmaxf(fraction_speed*effect_len, min_speed);
         gamestate->camera.target = Vector2Add(gamestate->camera.target, Vector2Scale(diff, speed*dt/effect_len));
+    }
+
+    // Update camera fade
+    if(gamestate->is_fading)
+    {
+        f32 speed = 1.0f;
+        gamestate->fade_timer += dt * speed;
+        f32 t = Clamp(gamestate->fade_timer / gamestate->fade_duration, 0.0f, 1.0f);
+        f32 eased = EaseInOut(t);
+        gamestate->fade_alpha = gamestate->fade_in ? 1.0f - eased : eased;
+
+        if(t >= 1.0f)
+        {
+            if(!gamestate->fade_in)
+            {
+                // Finished fading
+                if(gamestate->pending_level_increment)
+                {
+                    if(SetupLevel(gamestate, gamestate->level_num))
+                    {
+                        ResetPlayerPos(gamestate);
+                    }
+                    else
+                    {
+                        printf("No more levels. Should probably go to menu..\n");
+                    }
+
+                    gamestate->pending_level_increment = false;
+                }
+
+                gamestate->fade_in = true;
+                gamestate->fade_timer = 0;
+            }
+            else
+            {
+                // Done
+                gamestate->is_fading = false;
+                gamestate->player_can_move = true;
+            }
+        }
     }
 }
 
@@ -140,6 +175,8 @@ RenderGame(GameState *gamestate, f32 dt)
     AnimateEntity(&gamestate->player);
     DrawSprite(gamestate->texture_atlas, gamestate->player.sprite, PLAYER_WIDTH, PLAYER_HEIGHT);
     EndMode2D();
+
+    DrawCameraFade(gamestate);
 
     RenderHUD(gamestate);
 
