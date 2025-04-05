@@ -9,6 +9,8 @@ typedef uint32_t u32;
 typedef float f32;
 typedef double f64;
 typedef Vector2 v2;
+typedef int32_t b32;
+#define function static
 
 #define MAP_HEIGHT 10
 #define MAP_WIDTH 10
@@ -16,15 +18,40 @@ typedef Vector2 v2;
 #define TILE_HEIGHT 64
 
 #define MAX_ENTITIES 100
-#define ENTITY_MAX_VELOCITY 1000
+#define ENTITY_MAX_VELOCITY 200
 #define ENTITY_SIZE 32
+
+typedef enum
+{
+    Axis_X,
+    Axis_Y,
+} Axis;
+
+typedef enum
+{
+    CollisionFlag_None    = 0,
+    CollisionFlag_Overlap = 1 << 0,
+    CollisionFlag_Block   = 1 << 1,
+} CollisionFlag;
 
 typedef enum
 {
     Player,
     Obstacle,
-    Monster,
+    PressurePlate,
 } EntityType;
+
+function const char *
+PrettifyEntityType(EntityType type)
+{
+    switch(type)
+    {
+    case Player: return "Player";
+    case Obstacle: return "Obstacle";
+    case PressurePlate: return "PressurePlate";
+    default: return "Unknown";
+    }
+}
 
 typedef enum
 {
@@ -39,8 +66,13 @@ typedef struct
     v2 pos;
     v2 vel;
     f32 speed;
+
     EntityType type;
     Direction dir;
+    CollisionFlag collision_flag;
+
+    b32 pressure_plate_active;
+
 } Entity;
 
 typedef struct
@@ -49,7 +81,7 @@ typedef struct
     Entity entities[MAX_ENTITIES];
 } Tilemap;
 
-static void
+function void
 InitTilemap(Tilemap *map)
 {
     for(u32 y = 0; y < MAP_HEIGHT; ++y)
@@ -61,14 +93,14 @@ InitTilemap(Tilemap *map)
 
             if(x == 0 || x == MAP_WIDTH-1 || y == 0 || y == MAP_HEIGHT-1)
             {
-                Entity wall = { (v2){tile_x, tile_y}, Vector2Zero(), 0, Obstacle, Left };
+                Entity wall = { (v2){tile_x, tile_y}, Vector2Zero(), 0, Obstacle, Left, CollisionFlag_Block };
                 map->entities[map->entity_count++] = wall;
             }
         }
     }
 }
 
-static void
+function void
 DrawMapAndEntities(Tilemap *map)
 {
     for(u32 y = 0; y < MAP_HEIGHT; ++y)
@@ -93,9 +125,10 @@ DrawMapAndEntities(Tilemap *map)
                 DrawRectangleV(e->pos, (v2){ TILE_WIDTH, TILE_HEIGHT }, DARKGREEN);
             } break;
 
-            case Monster:
+            case PressurePlate:
             {
-                DrawRectangleV(e->pos, (v2){ ENTITY_SIZE, ENTITY_SIZE }, RED);
+                Color color = e->pressure_plate_active ? RED : BLUE;
+                DrawRectangleV(e->pos, (v2){ ENTITY_SIZE, ENTITY_SIZE }, color);
             }
 
             default: break;
@@ -103,8 +136,131 @@ DrawMapAndEntities(Tilemap *map)
     }
 }
 
-static void
-UpdatePlayer(Entity *player, Camera2D *camera, f32 dt)
+typedef struct
+{
+    Entity *collided_entity;
+    v2 normal;
+    b32 blocking;
+    b32 overlapping;
+} CollisionResult;
+
+function CollisionResult
+CheckCollision(Tilemap *map, Entity *player, v2 *velocity, Axis axis)
+{
+    Rectangle player_rect =
+    {
+        player->pos.x,
+        player->pos.y,
+        ENTITY_SIZE,
+        ENTITY_SIZE
+    };
+
+    CollisionResult result = {0};
+
+    for(u32 entity_index = 0; entity_index < map->entity_count; ++entity_index)
+    {
+        Entity *other = map->entities + entity_index;
+
+        Rectangle entity_rect = {0};
+        switch(other->type)
+        {
+            case PressurePlate:
+            {
+                entity_rect = (Rectangle){ other->pos.x, other->pos.y, ENTITY_SIZE, ENTITY_SIZE };
+            } break;
+
+            default:
+            {
+                entity_rect = (Rectangle){ other->pos.x, other->pos.y, TILE_WIDTH, TILE_HEIGHT };
+            } break;
+        }
+
+        if(CheckCollisionRecs(player_rect, entity_rect))
+        {
+            if(other->collision_flag & CollisionFlag_Block)
+            {
+                v2 player_center =
+                {
+                    player_rect.x + player_rect.width * 0.5f,
+                    player_rect.y + player_rect.height * 0.5f
+                };
+
+                v2 other_center =
+                {
+                    entity_rect.x + entity_rect.width * 0.5f,
+                    entity_rect.y + entity_rect.height * 0.5f,
+                };
+
+                f32 dx = player_center.x - other_center.x;
+                f32 dy = player_center.y - other_center.y;
+
+                f32 half_width = (player_rect.width + entity_rect.width) * 0.5f;
+                f32 half_height = (player_rect.height + entity_rect.height) * 0.5f;
+
+                f32 overlap_x = half_width - fabsf(dx);
+                f32 overlap_y = half_height - fabsf(dy);
+
+                if(overlap_x < overlap_y)
+                {
+                    result.normal.x = (dx > 0) ? 1.0f : -1.0f;
+                }
+                else
+                {
+                    result.normal.y = (dy > 0) ? 1.0f : -1.0f;
+                }
+
+                if(axis == Axis_X && result.normal.x != 0)
+                {
+                    player->pos.x += result.normal.x * overlap_x;
+
+                    if(velocity)
+                    {
+                        f32 dot = Vector2DotProduct(*velocity, result.normal);
+                        if(dot < 0)
+                        {
+                            v2 correction = Vector2Scale(result.normal, dot);
+                            *velocity = Vector2Subtract(*velocity, correction);
+                        }
+                    }
+
+                    player_rect.x = player->pos.x;
+                }
+                else if(axis == Axis_Y && result.normal.y != 0)
+                {
+                    player->pos.y += result.normal.y * overlap_y;
+
+                    if(velocity)
+                    {
+                        f32 dot = Vector2DotProduct(*velocity, result.normal);
+                        if(dot < 0)
+                        {
+                            v2 correction = Vector2Scale(result.normal, dot);
+                            *velocity = Vector2Subtract(*velocity, correction);
+                        }
+                    }
+
+                    player_rect.y = player->pos.y;
+                }
+
+                result.collided_entity = other;
+                result.blocking = true;
+                return result;
+
+            }
+            else if(other->collision_flag & CollisionFlag_Overlap)
+            {
+                result.collided_entity = other;
+                result.overlapping = true;
+                return result;
+            }
+        }
+    }
+
+    return result;
+}
+
+function void
+UpdatePlayer(Tilemap *map, Entity *player, Camera2D *camera, f32 dt)
 {
     v2 movement_vector = {0};
 
@@ -149,7 +305,29 @@ UpdatePlayer(Entity *player, Camera2D *camera, f32 dt)
     player->vel.y += movement_vector.y * dt;
 
     player->pos.x += player_delta.x;
+    CollisionResult collision_result_x = CheckCollision(map, player, &player->vel, Axis_X);
+
     player->pos.y += player_delta.y;
+    CollisionResult collision_result_y = CheckCollision(map, player, &player->vel, Axis_Y);
+
+    if(collision_result_x.blocking && collision_result_x.collided_entity)
+    {
+        printf("Blocking collision with entity %s\n", PrettifyEntityType(collision_result_x.collided_entity->type));
+    }
+    if(collision_result_y.blocking && collision_result_y.collided_entity)
+    {
+        printf("Blocking collision with entity %s\n", PrettifyEntityType(collision_result_y.collided_entity->type));
+    }
+
+    if(collision_result_x.overlapping && collision_result_x.collided_entity)
+    {
+        printf("Overlapping collision with entity %s\n", PrettifyEntityType(collision_result_x.collided_entity->type));
+    }
+    if(collision_result_y.overlapping && collision_result_y.collided_entity)
+    {
+        printf("Overlapping collision with entity %s\n", PrettifyEntityType(collision_result_y.collided_entity->type));
+    }
+
     camera->target = player->pos;
 }
 
@@ -162,7 +340,7 @@ int main(void)
     SetTargetFPS(60);
 
     v2 start_pos = { window_width / 2.0f, window_height / 2.0f };
-    Entity player = { start_pos, Vector2Zero(), 2000, Player, Left };
+    Entity player = { start_pos, Vector2Zero(), 2000, Player, Left, CollisionFlag_Overlap };
 
     Camera2D camera = {0};
     camera.offset = start_pos;
@@ -172,14 +350,15 @@ int main(void)
     Tilemap map = {0};
     InitTilemap(&map);
 
-    Entity monster = { (v2){ TILE_WIDTH*1.25f, TILE_HEIGHT*1.25f }, Vector2Zero(), 1800, Monster, Left };
+    Entity monster = { (v2){ TILE_WIDTH*1.25f, TILE_HEIGHT*1.25f }, Vector2Zero(), 1800, PressurePlate, Left, CollisionFlag_Overlap };
     map.entities[map.entity_count++] = monster;
 
     while(!WindowShouldClose())
     {
         f32 dt = GetFrameTime();
+        dt = Clamp(dt, dt, 1.0f/30.0f);
 
-        UpdatePlayer(&player, &camera, dt);
+        UpdatePlayer(&map, &player, &camera, dt);
 
         BeginDrawing();
         ClearBackground(BLACK);
