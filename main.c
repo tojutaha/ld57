@@ -17,12 +17,13 @@ typedef Vector2 v2;
 
 #define MAX_ENTITIES 100
 #define ENTITY_MAX_VELOCITY 1000
+#define ENTITY_SIZE 32
 
 typedef enum
 {
     Player,
     Obstacle,
-    Monsteŕ,
+    Monster,
 } EntityType;
 
 typedef enum
@@ -63,6 +64,41 @@ InitTilemap(Tilemap *map)
                 Entity wall = { (v2){tile_x, tile_y}, Vector2Zero(), 0, Obstacle, Left };
                 map->entities[map->entity_count++] = wall;
             }
+        }
+    }
+}
+
+static void
+DrawMapAndEntities(Tilemap *map)
+{
+    for(u32 y = 0; y < MAP_HEIGHT; ++y)
+    {
+        for(u32 x = 0; x < MAP_WIDTH; ++x)
+        {
+            f32 tile_x = x * TILE_WIDTH;
+            f32 tile_y = y * TILE_HEIGHT;
+
+            DrawRectangle(tile_x, tile_y, TILE_WIDTH, TILE_HEIGHT, GREEN);
+            DrawRectangleLines(tile_x, tile_y, TILE_WIDTH, TILE_HEIGHT, BLACK);
+        }
+    }
+
+    for(u32 entity_index = 0; entity_index < map->entity_count; ++entity_index)
+    {
+        Entity *e = map->entities + entity_index;
+        switch(e->type)
+        {
+            case Obstacle:
+            {
+                DrawRectangleV(e->pos, (v2){ TILE_WIDTH, TILE_HEIGHT }, DARKGREEN);
+            } break;
+
+            case Monster:
+            {
+                DrawRectangleV(e->pos, (v2){ ENTITY_SIZE, ENTITY_SIZE }, RED);
+            }
+
+            default: break;
         }
     }
 }
@@ -117,36 +153,6 @@ UpdatePlayer(Entity *player, Camera2D *camera, f32 dt)
     camera->target = player->pos;
 }
 
-static void
-DrawMap(Tilemap *map)
-{
-    for(u32 y = 0; y < MAP_HEIGHT; ++y)
-    {
-        for(u32 x = 0; x < MAP_WIDTH; ++x)
-        {
-            f32 tile_x = x * TILE_WIDTH;
-            f32 tile_y = y * TILE_HEIGHT;
-
-            DrawRectangle(tile_x, tile_y, TILE_WIDTH, TILE_HEIGHT, GREEN);
-            DrawRectangleLines(tile_x, tile_y, TILE_WIDTH, TILE_HEIGHT, BLACK);
-        }
-    }
-
-    for(u32 entity_index = 0; entity_index < map->entity_count; ++entity_index)
-    {
-        Entity *e = map->entities + entity_index;
-        switch(e->type)
-        {
-            case Obstacle:
-            {
-                DrawRectangleV(e->pos, (v2){ TILE_WIDTH, TILE_HEIGHT }, RED);
-            } break;
-
-            default: break;
-        }
-    }
-}
-
 int main(void)
 {
     s32 window_width = 800;
@@ -156,7 +162,7 @@ int main(void)
     SetTargetFPS(60);
 
     v2 start_pos = { window_width / 2.0f, window_height / 2.0f };
-    Entity player = { start_pos, Vector2Zero(), 2000, Player };
+    Entity player = { start_pos, Vector2Zero(), 2000, Player, Left };
 
     Camera2D camera = {0};
     camera.offset = start_pos;
@@ -165,6 +171,9 @@ int main(void)
 
     Tilemap map = {0};
     InitTilemap(&map);
+
+    Entity monster = { (v2){ TILE_WIDTH*1.25f, TILE_HEIGHT*1.25f }, Vector2Zero(), 1800, Monster, Left };
+    map.entities[map.entity_count++] = monster;
 
     while(!WindowShouldClose())
     {
@@ -176,7 +185,7 @@ int main(void)
         ClearBackground(BLACK);
         BeginMode2D(camera);
 
-        DrawMap(&map);
+        DrawMapAndEntities(&map);
 
         DrawRectangleV(player.pos, (v2){ 32, 32 }, BLUE);
 
