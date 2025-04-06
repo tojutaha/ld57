@@ -144,8 +144,7 @@ UpdateGame(GameState *gamestate, f32 dt)
         gamestate->fade_alpha = gamestate->fade_in ? 1.0f - eased : eased;
 
         // Zoom the camera in a bit
-        f32 camera_zoom_speed = 0.35f;
-        gamestate->camera.zoom -= t * camera_zoom_speed;
+        gamestate->camera.zoom -= t * 0.35f;
         gamestate->camera.zoom = Clamp(gamestate->camera.zoom, 0.0, 1.0f);
         // And rotate, why not..
         gamestate->camera.rotation += t * 25.0f;

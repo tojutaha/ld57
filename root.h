@@ -30,3 +30,4 @@ global b32 global_running;
 #include "collision.c"
 #include "HUD.c"
 #include "game.c"
+

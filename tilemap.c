@@ -39,7 +39,7 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
         Entity *e = map->entities + entity_index;
         switch(e->type)
         {
-            case Obstacle:
+            case Wall:
             {
                 DrawRectangleV(e->pos, (v2){ TILE_WIDTH, TILE_HEIGHT }, DARKGREEN);
             } break;
@@ -117,28 +117,6 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
     }
 }
 
-function Entity *
-AddPressurePlate(Tilemap *map, s32 x, s32 y)
-{
-    Entity e =
-    {
-        .pos = (v2){ x * TILE_WIDTH + PRESSURE_PLATE_SIZE, y * TILE_HEIGHT + PRESSURE_PLATE_SIZE },
-        .vel = Vector2Zero(),
-        .speed = 0,
-        .type = PressurePlate,
-        .collision_flag = CollisionFlag_Overlap,
-        .activated = false,
-        .has_timer = false,
-        .deactivation_time = 0,
-        .timer = 0,
-    };
-
-    map->entities[map->entity_count++] = e;
-    map->active_entity_count++;
-
-    return &map->entities[map->entity_count - 1];
-}
-
 function void
 InitTilemap(Tilemap *map)
 {
@@ -153,15 +131,13 @@ InitTilemap(Tilemap *map)
 
             if(x == MAP_WIDTH/2 && y == 0)
             {
-                Entity door = { .pos = (v2){tile_x, tile_y}, Vector2Zero(), 0, Door, Left, CollisionFlag_Block };
-                map->entities[map->entity_count++] = door;
+                AddDoor(map, tile_x, tile_y);
                 continue;
             }
 
             if(x == 0 || x == MAP_WIDTH-1 || y == 0 || y == MAP_HEIGHT-1)
             {
-                Entity wall = { .pos = (v2){tile_x, tile_y}, Vector2Zero(), 0, Obstacle, Left, CollisionFlag_Block };
-                map->entities[map->entity_count++] = wall;
+                AddWall(map, tile_x, tile_y);
             }
         }
     }

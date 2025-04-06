@@ -1,6 +1,10 @@
 #pragma once
 #include "root.h"
 
+//
+// Add entities
+//
+
 function Entity
 AddPlayer(GameState *gamestate)
 {
@@ -23,6 +27,70 @@ AddPlayer(GameState *gamestate)
 
     return player;
 }
+
+function Entity *
+AddPressurePlate(Tilemap *map, s32 x, s32 y)
+{
+    Entity e =
+    {
+        .pos = (v2){ x * TILE_WIDTH + PRESSURE_PLATE_SIZE, y * TILE_HEIGHT + PRESSURE_PLATE_SIZE },
+        .vel = Vector2Zero(),
+        .speed = 0,
+        .type = PressurePlate,
+        .collision_flag = CollisionFlag_Overlap,
+        .activated = false,
+        .has_timer = false,
+        .deactivation_time = 0,
+        .timer = 0,
+    };
+
+    map->entities[map->entity_count++] = e;
+    map->active_entity_count++;
+
+    return &map->entities[map->entity_count - 1];
+}
+
+function void
+AddWall(Tilemap *map, s32 x, s32 y)
+{
+    Entity e =
+    {
+        .pos = (v2){ x, y },
+        .vel = Vector2Zero(),
+        .speed = 0,
+        .type = Wall,
+        .collision_flag = CollisionFlag_Block,
+        .activated = false,
+        .has_timer = false,
+        .deactivation_time = 0,
+        .timer = 0,
+    };
+
+    map->entities[map->entity_count++] = e;
+}
+
+function void
+AddDoor(Tilemap *map, s32 x, s32 y)
+{
+    Entity e =
+    {
+        .pos = (v2){ x, y },
+        .vel = Vector2Zero(),
+        .speed = 0,
+        .type = Door,
+        .collision_flag = CollisionFlag_Block,
+        .activated = false,
+        .has_timer = false,
+        .deactivation_time = 0,
+        .timer = 0,
+    };
+
+    map->entities[map->entity_count++] = e;
+}
+
+//
+//
+//
 
 function void
 ResetPlayerPos(GameState *gamestate)

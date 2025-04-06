@@ -16,7 +16,7 @@ typedef enum
     None,
     Player,
     Door,
-    Obstacle,
+    Wall,
     PressurePlate,
 } EntityType;
 
@@ -27,7 +27,7 @@ PrettifyEntityType(EntityType type)
     {
     case Player: return "Player";
     case Door: return "Door";
-    case Obstacle: return "Obstacle";
+    case Wall: return "Wall";
     case PressurePlate: return "PressurePlate";
     default: return "Unknown";
     }
