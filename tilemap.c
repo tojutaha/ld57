@@ -58,11 +58,11 @@ DrawMapAndEntities(Tilemap *map, f32 dt)
 
                 if(e->has_timer && e->pressure_plate_active)
                 {
-                    e->pressure_plate_timer -= dt;
-                    if(e->pressure_plate_timer <= 0)
+                    e->pressure_plate_timer += dt;
+                    if(e->pressure_plate_timer >= e->pressure_plate_deactivate_time)
                     {
-                        e->pressure_plate_active =   false;
-                        e->pressure_plate_timer = 3.0f;
+                        e->pressure_plate_active = false;
+                        e->pressure_plate_timer = 0.0f;
                         e->collision_flag = CollisionFlag_Overlap;
                     }
                 }
@@ -110,6 +110,7 @@ AddPressurePlate(Tilemap *map, s32 x, s32 y)
         .collision_flag = CollisionFlag_Overlap,
         .pressure_plate_active = false,
         .has_timer = false,
+        .pressure_plate_deactivate_time = 0,
         .pressure_plate_timer = 0,
     };
 
@@ -188,12 +189,12 @@ SetupLevel(GameState *gamestate, u32 level_num)
 
         case 1:
         {
-            // Little variation for next level
+            // Little variation for next level with timed plate
             AddPressurePlate(&gamestate->current_map, 1, 1);
             AddPressurePlate(&gamestate->current_map, 2, 2);
             Entity * e = AddPressurePlate(&gamestate->current_map, 3, 3);
             e->has_timer = true;
-            e->pressure_plate_timer = 3.0f;
+            e->pressure_plate_deactivate_time = 3.0f;
 
             return true;
         }
