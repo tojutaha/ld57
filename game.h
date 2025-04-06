@@ -18,6 +18,8 @@ typedef struct
 
     Sound blip1;
     Sound blip2;
+    Sound door1;
+    Sound door2;
 
     GameMode game_mode;
 

@@ -41,9 +41,18 @@ DrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
 
                 map->door_open = all_presssed;
                 if(map->door_open)
+                {
+                    if(e->collision_flag & CollisionFlag_Block)
+                        PlaySound(gamestate->door1);
+
                     e->collision_flag = CollisionFlag_Overlap;
+                }
                 else
+                {
+                    if(e->collision_flag & CollisionFlag_Overlap)
+                        PlaySound(gamestate->door2);
                     e->collision_flag = CollisionFlag_Block;
+                }
 
                 Color color = map->door_open ? GOLD : DARKGREEN;
 

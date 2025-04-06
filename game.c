@@ -16,6 +16,8 @@ InitGame(GameState *gamestate)
     gamestate->texture_atlas = LoadTexture("./resources/spritesheet.png");
     gamestate->blip1 = LoadSound("./resources/blip1.wav");
     gamestate->blip2 = LoadSound("./resources/blip2.wav");
+    gamestate->door1 = LoadSound("./resources/door1.wav");
+    gamestate->door2 = LoadSound("./resources/door2.wav");
 
     gamestate->game_mode = GameMode_MainMenu;
     
