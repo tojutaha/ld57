@@ -7,7 +7,8 @@ InitGame(GameState *gamestate)
     gamestate->screen_width = 800;
     gamestate->screen_height = 600;
 
-    SetConfigFlags(FLAG_VSYNC_HINT|FLAG_MSAA_4X_HINT);
+    // SetConfigFlags(FLAG_VSYNC_HINT|FLAG_MSAA_4X_HINT);
+    SetConfigFlags(FLAG_VSYNC_HINT);
     InitWindow(gamestate->screen_width, gamestate->screen_height, "LD57");
     SetTargetFPS(TARGET_FPS);
 
@@ -93,17 +94,6 @@ UpdateGame(GameState *gamestate, f32 dt)
 
     player->pos.y += player_delta.y;
     CollisionResult collision_result_y = CheckCollision(map, player, &player->vel, Axis_Y);
-
-#if 0
-    if(collision_result_x.blocking && collision_result_x.collided_entity)
-    {
-        printf("Blocking collision with entity %s\n", PrettifyEntityType(collision_result_x.collided_entity->type));
-    }
-    if(collision_result_y.blocking && collision_result_y.collided_entity)
-    {
-        printf("Blocking collision with entity %s\n", PrettifyEntityType(collision_result_y.collided_entity->type));
-    }
-#endif
 
     if(collision_result_x.overlapping)
     {

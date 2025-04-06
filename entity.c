@@ -31,6 +31,11 @@ AddPlayer(GameState *gamestate)
 function Entity *
 AddPressurePlate(Tilemap *map, s32 x, s32 y)
 {
+    Sprite sprite = {0};
+    // sprite.src = (Rectangle){ 32, 320, PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
+    // sprite.src = (Rectangle){ 32, 384, PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
+    sprite.src = (Rectangle){ 32, 448, PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
+
     Entity e =
     {
         .pos = (v2){ x * TILE_WIDTH + PRESSURE_PLATE_SIZE, y * TILE_HEIGHT + PRESSURE_PLATE_SIZE },
@@ -42,6 +47,7 @@ AddPressurePlate(Tilemap *map, s32 x, s32 y)
         .has_timer = false,
         .deactivation_time = 0,
         .timer = 0,
+        .sprite = sprite
     };
 
     map->entities[map->entity_count++] = e;
@@ -53,6 +59,8 @@ AddPressurePlate(Tilemap *map, s32 x, s32 y)
 function void
 AddWall(Tilemap *map, s32 x, s32 y)
 {
+    Sprite sprite = {0};
+    sprite.src = (Rectangle){ 32, 576, TILE_WIDTH, TILE_HEIGHT };
     Entity e =
     {
         .pos = (v2){ x, y },
@@ -64,6 +72,7 @@ AddWall(Tilemap *map, s32 x, s32 y)
         .has_timer = false,
         .deactivation_time = 0,
         .timer = 0,
+        .sprite = sprite
     };
 
     map->entities[map->entity_count++] = e;

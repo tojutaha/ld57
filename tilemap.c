@@ -29,7 +29,7 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
             f32 tile_x = x * TILE_WIDTH;
             f32 tile_y = y * TILE_HEIGHT;
 
-            DrawRectangle(tile_x, tile_y, TILE_WIDTH, TILE_HEIGHT, GREEN);
+            DrawRectangle(tile_x, tile_y, TILE_WIDTH, TILE_HEIGHT, DARKGRAY);
             DrawRectangleLines(tile_x, tile_y, TILE_WIDTH, TILE_HEIGHT, BLACK);
         }
     }
@@ -41,7 +41,7 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
         {
             case Wall:
             {
-                DrawRectangleV(e->pos, (v2){ TILE_WIDTH, TILE_HEIGHT }, DARKGREEN);
+                DrawTextureRec(gamestate->texture_atlas, e->sprite.src, e->pos, WHITE);
             } break;
 
             case Door:
@@ -61,14 +61,13 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
                     e->collision_flag = CollisionFlag_Block;
                 }
 
-                Color color = map->door_open ? GOLD : DARKGREEN;
+                Color color = map->door_open ? GOLD : DARKBROWN;
 
                 DrawRectangleV(e->pos, (v2){ TILE_WIDTH, TILE_HEIGHT }, color);
             } break;
 
             case PressurePlate:
             {
-                Color color = e->activated ? RED : BLUE;
                 v2 original_size = (v2){ PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
                 v2 size = original_size;
                 f32 speed = 12.0f;
@@ -88,14 +87,22 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
 
                 if(e->activated)
                 {
-                    v2 target = (v2){ PRESSURE_PLATE_SIZE-shrink_amount, PRESSURE_PLATE_SIZE-shrink_amount };
+                    e->sprite.src.x = 96;
+                    v2 target = (v2){
+                        PRESSURE_PLATE_SIZE - shrink_amount * 0.3f,
+                        PRESSURE_PLATE_SIZE - shrink_amount
+                    };
                     e->alpha += dt * speed;
                     e->alpha = Clamp(e->alpha, 0.0f, 1.0f);
                     size = Vector2Lerp(size, target, e->alpha);
                 }
                 else
                 {
-                    v2 target = (v2){ PRESSURE_PLATE_SIZE-shrink_amount, PRESSURE_PLATE_SIZE-shrink_amount };
+                    e->sprite.src.x = 32;
+                    v2 target = (v2){
+                        PRESSURE_PLATE_SIZE-shrink_amount * 0.3f,
+                        PRESSURE_PLATE_SIZE-shrink_amount
+                    };
                     e->alpha -= dt * speed;
                     e->alpha = Clamp(e->alpha, 0.0f, 1.0f);
                     size = Vector2Lerp(size, target, e->alpha);
@@ -109,7 +116,12 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
 
                 v2 draw_pos = Vector2Add(e->pos, offset);
 
-                DrawRectangleV(draw_pos, size, color);
+                Rectangle dst =
+                {
+                    draw_pos.x, draw_pos.y, size.x, size.y
+                };
+
+                DrawTexturePro(gamestate->texture_atlas, e->sprite.src, dst, (v2){0, 0}, 0.0f, WHITE);
             } break;
 
             default: break;
@@ -148,7 +160,7 @@ function void
 ResetTilemap(Tilemap *map)
 {
     map->active_entity_count = 0;
-    memset(map->entities, 0, sizeof(Entity) * /*map->entity_count*/ MAX_ENTITIES);
+    memset(map->entities, 0, sizeof(Entity) * MAX_ENTITIES);
     map->entity_count = 0;
     map->door_open = false;
 }
@@ -216,3 +228,4 @@ NewGame(GameState *gamestate)
     gamestate->player = AddPlayer(gamestate);
     gamestate->player_can_move = true;
 }
+

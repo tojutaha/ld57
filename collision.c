@@ -121,8 +121,6 @@ HandleOverlappingCollision(GameState *gamestate, Tilemap *map, Entity *e)
 {
     if(e)
     {
-        // printf("Overlapping collision with entity %s\n", PrettifyEntityType(e->type));
-
         switch(e->type)
         {
             case PressurePlate:

@@ -20,19 +20,6 @@ typedef enum
     PressurePlate,
 } EntityType;
 
-function const char *
-PrettifyEntityType(EntityType type)
-{
-    switch(type)
-    {
-    case Player: return "Player";
-    case Door: return "Door";
-    case Wall: return "Wall";
-    case PressurePlate: return "PressurePlate";
-    default: return "Unknown";
-    }
-}
-
 typedef enum
 {
     Left,
