@@ -30,7 +30,8 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
             f32 tile_y = y * TILE_HEIGHT;
 
             DrawRectangle(tile_x, tile_y, TILE_WIDTH, TILE_HEIGHT, DARKGRAY);
-            DrawRectangleLines(tile_x, tile_y, TILE_WIDTH, TILE_HEIGHT, BLACK);
+            Color outline_color = { 75, 75, 75, 255 };
+            DrawRectangleLines(tile_x, tile_y, TILE_WIDTH, TILE_HEIGHT, outline_color);
         }
     }
 
@@ -202,7 +203,7 @@ SetupLevel(GameState *gamestate, u32 level_num)
         case 0:
         {
             // Default first level; Learn about the plates and door
-            AddPressurePlate(&gamestate->current_map, 1, 1);
+            AddPressurePlate(&gamestate->current_map, 1, 1, PlateColor_Green);
 
             return true;
         }
@@ -210,9 +211,9 @@ SetupLevel(GameState *gamestate, u32 level_num)
         case 1:
         {
             // Little variation for next level; Learn about the timers
-            AddPressurePlate(&gamestate->current_map, 1, 1);
-            AddPressurePlate(&gamestate->current_map, 2, 2);
-            Entity * e = AddPressurePlate(&gamestate->current_map, 3, 3);
+            AddPressurePlate(&gamestate->current_map, 1, 1, PlateColor_Green);
+            AddPressurePlate(&gamestate->current_map, 2, 2, PlateColor_Green);
+            Entity * e = AddPressurePlate(&gamestate->current_map, 3, 3, PlateColor_Red);
             e->has_timer = true;
             e->deactivation_time = 2.5f;
 

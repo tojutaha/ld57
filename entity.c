@@ -29,12 +29,27 @@ AddPlayer(GameState *gamestate)
 }
 
 function Entity *
-AddPressurePlate(Tilemap *map, s32 x, s32 y)
+AddPressurePlate(Tilemap *map, s32 x, s32 y, PlateColor color)
 {
     Sprite sprite = {0};
-    // sprite.src = (Rectangle){ 32, 320, PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
-    // sprite.src = (Rectangle){ 32, 384, PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
-    sprite.src = (Rectangle){ 32, 448, PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
+
+    switch(color)
+    {
+        case PlateColor_Red:
+        {
+            sprite.src = (Rectangle){ 32, 320, PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
+        } break;
+
+        case PlateColor_Green:
+        {
+            sprite.src = (Rectangle){ 32, 384, PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
+        } break;
+
+        case PlateColor_Blue:
+        {
+            sprite.src = (Rectangle){ 32, 448, PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
+        } break;
+    }
 
     Entity e =
     {

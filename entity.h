@@ -6,6 +6,13 @@
 
 typedef enum
 {
+    PlateColor_Red,
+    PlateColor_Green,
+    PlateColor_Blue,
+} PlateColor;
+
+typedef enum
+{
     CollisionFlag_None    = 0,
     CollisionFlag_Overlap = 1 << 0,
     CollisionFlag_Block   = 1 << 1,
