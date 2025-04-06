@@ -166,8 +166,8 @@ UpdateGame(GameState *gamestate, f32 dt)
             else
             {
                 // Done
-                gamestate->camera.zoom = CAMERA_ZOOM;
-                gamestate->camera.rotation = 0;
+                // gamestate->camera.zoom = CAMERA_ZOOM;
+                // gamestate->camera.rotation = 0;
                 gamestate->is_fading = false;
                 gamestate->player_can_move = true;
             }

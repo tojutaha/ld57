@@ -83,6 +83,7 @@ AddDoor(Tilemap *map, s32 x, s32 y)
 {
     v2 pos = { x, y };
     Sprite sprite = {0};
+    sprite.src = (Rectangle){ 224, 576, TILE_WIDTH, TILE_HEIGHT };
     sprite.pos = pos;
 
     Entity e =

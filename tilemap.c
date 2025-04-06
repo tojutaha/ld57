@@ -47,7 +47,6 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
             case Door:
             {
                 v2 target_pos = e->pos;
-
                 map->door_open = IsAllEntitiesActivated(map);
                 if(map->door_open)
                 {
@@ -56,7 +55,7 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
 
                     e->collision_flag = CollisionFlag_Overlap;
 
-                    target_pos.y -= 1.25f * TILE_HEIGHT;
+                    target_pos.y -= TILE_HEIGHT;
                 }
                 else
                 {
@@ -70,7 +69,8 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
 
                 f32 speed = 2.0f;
                 e->sprite.pos = Vector2Lerp(e->sprite.pos, target_pos, Clamp(dt*speed, 0.0f, 1.0f));
-                DrawRectangleV(e->sprite.pos, (v2){ TILE_WIDTH, TILE_HEIGHT }, DARKBROWN);
+
+                DrawTextureRec(gamestate->texture_atlas, e->sprite.src, e->sprite.pos, WHITE);
 
             } break;
 
@@ -135,6 +135,11 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
             default: break;
         }
     }
+
+    // Door frame
+    Rectangle frame_rect = { 128, 576, 64, 64 };
+    v2 frame_pos = { (TILE_WIDTH * MAP_WIDTH) * 0.5f, 0 };
+    DrawTextureRec(gamestate->texture_atlas, frame_rect, frame_pos, WHITE);
 }
 
 function void
