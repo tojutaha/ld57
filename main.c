@@ -5,6 +5,7 @@ int main(void)
 {
     GameState *gamestate = malloc(sizeof *gamestate);
     Assert(gamestate != NULL);
+    memset(gamestate, 0, sizeof *gamestate);
 
     InitGame(gamestate);
 

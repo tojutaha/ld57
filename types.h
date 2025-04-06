@@ -24,7 +24,11 @@ typedef int32_t b32;
 #define enum64(type) u64
 
 #if INTERNAL
+#if _WIN32
+#define Assert(Expr) if (!(Expr)) { __debugbreak(); }
+#else
 #define Assert(Expr) if (!(Expr)) { __builtin_trap(); }
+#endif
 #else
 #define Assert(Expr)
 #endif

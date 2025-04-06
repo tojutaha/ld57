@@ -121,7 +121,7 @@ function void
 ResetTilemap(Tilemap *map)
 {
     map->pressure_plate_count = 0;
-    memset(map->entities, 0, sizeof(Entity) * map->entity_count);
+    memset(map->entities, 0, sizeof(Entity) * /*map->entity_count*/ MAX_ENTITIES);
     map->entity_count = 0;
     map->door_open = false;
 }
