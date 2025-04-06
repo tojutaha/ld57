@@ -46,6 +46,8 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
 
             case Door:
             {
+                v2 target_pos = e->pos;
+
                 map->door_open = IsAllEntitiesActivated(map);
                 if(map->door_open)
                 {
@@ -53,17 +55,23 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
                         PlaySound(gamestate->door1);
 
                     e->collision_flag = CollisionFlag_Overlap;
+
+                    target_pos.y -= 1.25f * TILE_HEIGHT;
                 }
                 else
                 {
                     if(e->collision_flag & CollisionFlag_Overlap)
                         PlaySound(gamestate->door2);
+
                     e->collision_flag = CollisionFlag_Block;
+
+                    target_pos = e->pos;
                 }
 
-                Color color = map->door_open ? GOLD : DARKBROWN;
+                f32 speed = 2.0f;
+                e->sprite.pos = Vector2Lerp(e->sprite.pos, target_pos, Clamp(dt*speed, 0.0f, 1.0f));
+                DrawRectangleV(e->sprite.pos, (v2){ TILE_WIDTH, TILE_HEIGHT }, DARKBROWN);
 
-                DrawRectangleV(e->pos, (v2){ TILE_WIDTH, TILE_HEIGHT }, color);
             } break;
 
             case PressurePlate:

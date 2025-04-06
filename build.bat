@@ -13,9 +13,6 @@ if "%IsDebug%"=="1" (
 )
 
 set CommonLinkerFlags= %CommonLinkerFlags% opengl32.lib gdi32.lib User32.lib shell32.lib winmm.lib
-if "%IsDebug%"=="1" (
-    set CommonLinkerFlags= %CommonLinkerFlags% kernel32.lib dbghelp.lib psapi.lib setupapi.lib
-)
 
 echo Building game...
 cl %Includes% %CommonCompilerFlags% main.c /Fe:main.exe /link /NODEFAULTLIB:MSVCRT /SUBSYSTEM:CONSOLE -incremental:no -opt:ref %CommonLinkerFlags%

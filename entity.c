@@ -16,7 +16,7 @@ AddPlayer(GameState *gamestate)
         .frame_counter = 0,
     };
 
-    v2 start_pos = { gamestate->screen_width / 2.0f, gamestate->screen_height / 2.0f };
+    v2 start_pos = { (TILE_WIDTH * MAP_WIDTH) / 2.0f, (TILE_HEIGHT * MAP_HEIGHT) / 2.0f };
     Entity player = { sprite, start_pos, Vector2Zero(), 2000, Player, Left, CollisionFlag_Overlap };
     sprite.pos = player.pos;
 
@@ -81,9 +81,13 @@ AddWall(Tilemap *map, s32 x, s32 y)
 function void
 AddDoor(Tilemap *map, s32 x, s32 y)
 {
+    v2 pos = { x, y };
+    Sprite sprite = {0};
+    sprite.pos = pos;
+
     Entity e =
     {
-        .pos = (v2){ x, y },
+        .pos = pos,
         .vel = Vector2Zero(),
         .speed = 0,
         .type = Door,
@@ -92,6 +96,7 @@ AddDoor(Tilemap *map, s32 x, s32 y)
         .has_timer = false,
         .deactivation_time = 0,
         .timer = 0,
+        .sprite = sprite
     };
 
     map->entities[map->entity_count++] = e;
@@ -104,7 +109,7 @@ AddDoor(Tilemap *map, s32 x, s32 y)
 function void
 ResetPlayerPos(GameState *gamestate)
 {
-    v2 start_pos = { gamestate->screen_width / 2.0f, gamestate->screen_height / 2.0f };
+    v2 start_pos = { (TILE_WIDTH * MAP_WIDTH) / 2.0f, (TILE_HEIGHT * MAP_HEIGHT) / 2.0f };
     gamestate->player.pos = start_pos;
     gamestate->player.sprite.pos = gamestate->player.pos;
 }

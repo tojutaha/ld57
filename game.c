@@ -4,8 +4,8 @@
 function void
 InitGame(GameState *gamestate)
 {
-    gamestate->screen_width = 800;
-    gamestate->screen_height = 600;
+    gamestate->screen_width = 1200;
+    gamestate->screen_height = 900;
 
     // SetConfigFlags(FLAG_VSYNC_HINT|FLAG_MSAA_4X_HINT);
     SetConfigFlags(FLAG_VSYNC_HINT);
@@ -133,11 +133,13 @@ UpdateGame(GameState *gamestate, f32 dt)
         f32 eased = EaseInOut(t);
         gamestate->fade_alpha = gamestate->fade_in ? 1.0f - eased : eased;
 
+#if 0
         // Zoom the camera in a bit
         gamestate->camera.zoom -= t * 0.35f;
         gamestate->camera.zoom = Clamp(gamestate->camera.zoom, 0.0, 1.0f);
         // And rotate, why not..
         gamestate->camera.rotation += t * 25.0f;
+#endif
 
         if(t >= 1.0f)
         {
