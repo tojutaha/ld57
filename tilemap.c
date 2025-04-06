@@ -28,11 +28,20 @@ DrawMapAndEntities(Tilemap *map, f32 dt)
 
             case Door:
             {
-                if(map->pressure_plate_count <= 0)
+                b32 all_presssed = true;
+                for(u32 i = 0; i < map->entity_count; ++i)
                 {
-                    map->door_open = true;
-                    e->collision_flag = CollisionFlag_Overlap;
+                    Entity *entity = &map->entities[i];
+                    if(entity->type == PressurePlate && !entity->pressure_plate_active)
+                    {
+                        all_presssed = false;
+                        break;
+                    }
                 }
+
+                map->door_open = all_presssed;
+                if(map->door_open)
+                    e->collision_flag = CollisionFlag_Overlap;
 
                 Color color = map->door_open ? GOLD : DARKGREEN;
 
@@ -45,12 +54,30 @@ DrawMapAndEntities(Tilemap *map, f32 dt)
                 v2 original_size = (v2){ PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
                 v2 size = original_size;
                 f32 speed = 12.0f;
+                f32 shrink_amount = 6.0f;
+
+                if(e->has_timer && e->pressure_plate_active)
+                {
+                    e->pressure_plate_timer -= dt;
+                    if(e->pressure_plate_timer <= 0)
+                    {
+                        e->pressure_plate_active =   false;
+                        e->pressure_plate_timer = 3.0f;
+                        e->collision_flag = CollisionFlag_Overlap;
+                    }
+                }
 
                 if(e->pressure_plate_active)
                 {
-                    f32 shrink_amount = 6.0f;
                     v2 target = (v2){ PRESSURE_PLATE_SIZE-shrink_amount, PRESSURE_PLATE_SIZE-shrink_amount };
                     e->alpha += dt * speed;
+                    e->alpha = Clamp(e->alpha, 0.0f, 1.0f);
+                    size = Vector2Lerp(size, target, e->alpha);
+                }
+                else
+                {
+                    v2 target = (v2){ PRESSURE_PLATE_SIZE-shrink_amount, PRESSURE_PLATE_SIZE-shrink_amount };
+                    e->alpha -= dt * speed;
                     e->alpha = Clamp(e->alpha, 0.0f, 1.0f);
                     size = Vector2Lerp(size, target, e->alpha);
                 }
@@ -64,14 +91,14 @@ DrawMapAndEntities(Tilemap *map, f32 dt)
                 v2 draw_pos = Vector2Add(e->pos, offset);
 
                 DrawRectangleV(draw_pos, size, color);
-            }
+            } break;
 
             default: break;
         }
     }
 }
 
-function void
+function Entity *
 AddPressurePlate(Tilemap *map, s32 x, s32 y)
 {
     Entity e =
@@ -82,10 +109,14 @@ AddPressurePlate(Tilemap *map, s32 x, s32 y)
         .type = PressurePlate,
         .collision_flag = CollisionFlag_Overlap,
         .pressure_plate_active = false,
+        .has_timer = false,
+        .pressure_plate_timer = 0,
     };
 
     map->entities[map->entity_count++] = e;
     map->pressure_plate_count++;
+
+    return &map->entities[map->entity_count - 1];
 }
 
 function void
@@ -160,7 +191,9 @@ SetupLevel(GameState *gamestate, u32 level_num)
             // Little variation for next level
             AddPressurePlate(&gamestate->current_map, 1, 1);
             AddPressurePlate(&gamestate->current_map, 2, 2);
-            AddPressurePlate(&gamestate->current_map, 3, 3);
+            Entity * e = AddPressurePlate(&gamestate->current_map, 3, 3);
+            e->has_timer = true;
+            e->pressure_plate_timer = 3.0f;
 
             return true;
         }

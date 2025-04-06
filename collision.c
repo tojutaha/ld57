@@ -130,7 +130,6 @@ HandleOverlappingCollision(GameState *gamestate, Tilemap *map, Entity *e)
                 if(!e->pressure_plate_active)
                 {
                     e->pressure_plate_active = true;
-                    map->pressure_plate_count--;
                     e->collision_flag = CollisionFlag_None;
                 }
             } break;

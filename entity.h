@@ -54,6 +54,9 @@ typedef struct
     CollisionFlag collision_flag;
 
     b32 pressure_plate_active;
+    b32 has_timer;
+    f32 pressure_plate_timer;
+
     f32 alpha;
 } Entity;
 
