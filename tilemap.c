@@ -181,7 +181,7 @@ SetupLevel(GameState *gamestate, u32 level_num)
     {
         case 0:
         {
-            // Default first level
+            // Default first level; Learn about the plates and door
             AddPressurePlate(&gamestate->current_map, 1, 1);
 
             return true;
@@ -189,12 +189,12 @@ SetupLevel(GameState *gamestate, u32 level_num)
 
         case 1:
         {
-            // Little variation for next level with timed plate
+            // Little variation for next level; Learn about the timers
             AddPressurePlate(&gamestate->current_map, 1, 1);
             AddPressurePlate(&gamestate->current_map, 2, 2);
             Entity * e = AddPressurePlate(&gamestate->current_map, 3, 3);
             e->has_timer = true;
-            e->pressure_plate_deactivate_time = 3.0f;
+            e->pressure_plate_deactivate_time = 2.5f;
 
             return true;
         }
