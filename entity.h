@@ -56,8 +56,8 @@ typedef struct
     b32 activated;
 
     b32 has_timer;
-    f32 pressure_plate_deactivate_time;
-    f32 pressure_plate_timer;
+    f32 timer;
+    f32 deactivation_time;
 
     f32 alpha;
 } Entity;

@@ -76,11 +76,11 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
 
                 if(e->has_timer && e->activated)
                 {
-                    e->pressure_plate_timer += dt;
-                    if(e->pressure_plate_timer >= e->pressure_plate_deactivate_time)
+                    e->timer += dt;
+                    if(e->timer >= e->deactivation_time)
                     {
                         e->activated = false;
-                        e->pressure_plate_timer = 0.0f;
+                        e->timer = 0.0f;
                         e->collision_flag = CollisionFlag_Overlap;
                         PlaySound(gamestate->blip2);
                     }
@@ -129,8 +129,8 @@ AddPressurePlate(Tilemap *map, s32 x, s32 y)
         .collision_flag = CollisionFlag_Overlap,
         .activated = false,
         .has_timer = false,
-        .pressure_plate_deactivate_time = 0,
-        .pressure_plate_timer = 0,
+        .deactivation_time = 0,
+        .timer = 0,
     };
 
     map->entities[map->entity_count++] = e;
@@ -213,7 +213,7 @@ SetupLevel(GameState *gamestate, u32 level_num)
             AddPressurePlate(&gamestate->current_map, 2, 2);
             Entity * e = AddPressurePlate(&gamestate->current_map, 3, 3);
             e->has_timer = true;
-            e->pressure_plate_deactivate_time = 2.5f;
+            e->deactivation_time = 2.5f;
 
             return true;
         }
