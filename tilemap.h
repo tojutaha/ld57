@@ -13,7 +13,7 @@
 
 typedef struct
 {
-    u32 pressure_plate_count;
+    u32 active_entity_count;
     b32 door_open;
 
     u32 entity_count;

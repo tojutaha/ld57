@@ -127,9 +127,9 @@ HandleOverlappingCollision(GameState *gamestate, Tilemap *map, Entity *e)
         {
             case PressurePlate:
             {
-                if(!e->pressure_plate_active)
+                if(!e->activated)
                 {
-                    e->pressure_plate_active = true;
+                    e->activated = true;
                     e->collision_flag = CollisionFlag_None;
                     PlaySound(gamestate->blip1);
                 }

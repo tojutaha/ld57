@@ -1,8 +1,26 @@
 #pragma once
 #include "root.h"
 
+function b32
+IsAllEntitiesActivated(Tilemap *map)
+{
+    b32 result = true;
+
+    for(u32 i = 0; i < map->entity_count; ++i)
+    {
+        Entity *e = &map->entities[i];
+        if(e->type == PressurePlate && !e->activated)
+        {
+            result = false;
+            break;
+        }
+    }
+
+    return result;
+}
+
 function void
-DrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
+UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
 {
     for(u32 y = 0; y < MAP_HEIGHT; ++y)
     {
@@ -28,18 +46,7 @@ DrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
 
             case Door:
             {
-                b32 all_presssed = true;
-                for(u32 i = 0; i < map->entity_count; ++i)
-                {
-                    Entity *entity = &map->entities[i];
-                    if(entity->type == PressurePlate && !entity->pressure_plate_active)
-                    {
-                        all_presssed = false;
-                        break;
-                    }
-                }
-
-                map->door_open = all_presssed;
+                map->door_open = IsAllEntitiesActivated(map);
                 if(map->door_open)
                 {
                     if(e->collision_flag & CollisionFlag_Block)
@@ -61,25 +68,25 @@ DrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
 
             case PressurePlate:
             {
-                Color color = e->pressure_plate_active ? RED : BLUE;
+                Color color = e->activated ? RED : BLUE;
                 v2 original_size = (v2){ PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
                 v2 size = original_size;
                 f32 speed = 12.0f;
                 f32 shrink_amount = 6.0f;
 
-                if(e->has_timer && e->pressure_plate_active)
+                if(e->has_timer && e->activated)
                 {
                     e->pressure_plate_timer += dt;
                     if(e->pressure_plate_timer >= e->pressure_plate_deactivate_time)
                     {
-                        e->pressure_plate_active = false;
+                        e->activated = false;
                         e->pressure_plate_timer = 0.0f;
                         e->collision_flag = CollisionFlag_Overlap;
                         PlaySound(gamestate->blip2);
                     }
                 }
 
-                if(e->pressure_plate_active)
+                if(e->activated)
                 {
                     v2 target = (v2){ PRESSURE_PLATE_SIZE-shrink_amount, PRESSURE_PLATE_SIZE-shrink_amount };
                     e->alpha += dt * speed;
@@ -120,14 +127,14 @@ AddPressurePlate(Tilemap *map, s32 x, s32 y)
         .speed = 0,
         .type = PressurePlate,
         .collision_flag = CollisionFlag_Overlap,
-        .pressure_plate_active = false,
+        .activated = false,
         .has_timer = false,
         .pressure_plate_deactivate_time = 0,
         .pressure_plate_timer = 0,
     };
 
     map->entities[map->entity_count++] = e;
-    map->pressure_plate_count++;
+    map->active_entity_count++;
 
     return &map->entities[map->entity_count - 1];
 }
@@ -164,7 +171,7 @@ InitTilemap(Tilemap *map)
 function void
 ResetTilemap(Tilemap *map)
 {
-    map->pressure_plate_count = 0;
+    map->active_entity_count = 0;
     memset(map->entities, 0, sizeof(Entity) * /*map->entity_count*/ MAX_ENTITIES);
     map->entity_count = 0;
     map->door_open = false;
