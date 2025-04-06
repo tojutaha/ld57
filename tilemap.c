@@ -42,6 +42,8 @@ DrawMapAndEntities(Tilemap *map, f32 dt)
                 map->door_open = all_presssed;
                 if(map->door_open)
                     e->collision_flag = CollisionFlag_Overlap;
+                else
+                    e->collision_flag = CollisionFlag_Block;
 
                 Color color = map->door_open ? GOLD : DARKGREEN;
 
@@ -209,4 +211,14 @@ function void
 IncrementLevel(GameState *gamestate)
 {
     StartLevelFade(gamestate, gamestate->level_num + 1);
+}
+
+function void
+NewGame(GameState *gamestate)
+{
+    gamestate->level_num = 0;
+    SetupLevel(gamestate, gamestate->level_num);
+
+    gamestate->player = AddPlayer(gamestate);
+    gamestate->player_can_move = true;
 }

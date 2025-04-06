@@ -14,11 +14,10 @@ InitGame(GameState *gamestate)
     InitAudioDevice();
 
     gamestate->texture_atlas = LoadTexture("./resources/spritesheet.png");
-    gamestate->level_num = 0;
-    SetupLevel(gamestate, gamestate->level_num);
+    gamestate->game_mode = GameMode_MainMenu;
+    
+    NewGame(gamestate);
 
-    gamestate->player = AddPlayer(gamestate);
-    gamestate->player_can_move = true;
 }
 
 function void
@@ -147,7 +146,7 @@ UpdateGame(GameState *gamestate, f32 dt)
                     }
                     else
                     {
-                        printf("No more levels. Should probably go to menu..\n");
+                        gamestate->game_mode = GameMode_EndMenu;
                     }
 
                     gamestate->pending_level_increment = false;

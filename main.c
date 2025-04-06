@@ -8,15 +8,28 @@ int main(void)
     memset(gamestate, 0, sizeof *gamestate);
 
     InitGame(gamestate);
+    SetExitKey(0);
 
-    while(!WindowShouldClose())
+    // while(!WindowShouldClose())
+    global_running = true;
+    while(global_running)
     {
+        global_running =  !WindowShouldClose();
+
         f32 dt = GetFrameTime();
+
+#if INTERNAL
+        if(IsKeyPressed(KEY_R))
+            NewGame(gamestate);
+#endif
 
         switch(gamestate->game_mode)
         {
             case GameMode_Game:
             {
+                if(IsKeyPressed(KEY_ESCAPE))
+                    gamestate->game_mode = GameMode_MainMenu;
+
                 UpdateGame(gamestate, dt);
                 RenderGame(gamestate, dt);
             } break;
@@ -26,9 +39,9 @@ int main(void)
                 DrawMainMenu(gamestate);
             } break;
 
-            case GameMode_PauseMenu:
+            case GameMode_EndMenu:
             {
-                DrawPauseMenu(gamestate);
+                DrawEndMenu(gamestate);
             } break;
         }
 

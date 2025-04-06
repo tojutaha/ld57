@@ -5,7 +5,7 @@ typedef enum
 {
     GameMode_Game,
     GameMode_MainMenu,
-    GameMode_PauseMenu
+    GameMode_EndMenu
 } GameMode;
 
 typedef struct
