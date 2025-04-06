@@ -18,7 +18,7 @@ AddPlayer(GameState *gamestate)
 
     gamestate->camera.rotation = 0.0f;
     gamestate->camera.offset = start_pos;
-    gamestate->camera.zoom = 1.5f;
+    gamestate->camera.zoom = CAMERA_ZOOM;
     gamestate->camera.target = player.pos;
 
     return player;

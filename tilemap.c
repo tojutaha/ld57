@@ -226,6 +226,7 @@ IncrementLevel(GameState *gamestate)
 function void
 NewGame(GameState *gamestate)
 {
+    gamestate->fade_timer = 0;
     gamestate->level_num = 0;
     SetupLevel(gamestate, gamestate->level_num);
 

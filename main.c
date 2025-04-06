@@ -22,6 +22,11 @@ int main(void)
         {
             case GameMode_Game:
             {
+#if INTERNAL
+                if(IsKeyDown(KEY_UP)) gamestate->camera.rotation += 0.1f;
+                if(IsKeyDown(KEY_DOWN)) gamestate->camera.rotation -= 0.1f;
+#endif
+
                 if(IsKeyPressed(KEY_ESCAPE))
                     gamestate->game_mode = GameMode_MainMenu;
 

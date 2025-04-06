@@ -4,7 +4,7 @@
 function void
 RenderHUD(GameState *gamestate)
 {
-
+    // TODO: Might be reduntant..
     // NOTE: Debug HUD
 #if INTERNAL
     Color bg_color = ColorAlpha(BLACK, 0.65f);

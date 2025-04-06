@@ -14,12 +14,18 @@ InitGame(GameState *gamestate)
     InitAudioDevice();
 
     gamestate->texture_atlas = LoadTexture("./resources/spritesheet.png");
+    SetTextureFilter(gamestate->texture_atlas, TEXTURE_FILTER_POINT);
+
     gamestate->blip1 = LoadSound("./resources/blip1.wav");
     gamestate->blip2 = LoadSound("./resources/blip2.wav");
     gamestate->door1 = LoadSound("./resources/door1.wav");
     gamestate->door2 = LoadSound("./resources/door2.wav");
 
+#if INTERNAL
+    gamestate->game_mode = GameMode_Game;
+#else
     gamestate->game_mode = GameMode_MainMenu;
+#endif
     
     NewGame(gamestate);
 }
@@ -137,6 +143,13 @@ UpdateGame(GameState *gamestate, f32 dt)
         f32 eased = EaseInOut(t);
         gamestate->fade_alpha = gamestate->fade_in ? 1.0f - eased : eased;
 
+        // Zoom the camera in a bit
+        f32 camera_zoom_speed = 0.35f;
+        gamestate->camera.zoom -= t * camera_zoom_speed;
+        gamestate->camera.zoom = Clamp(gamestate->camera.zoom, 0.0, 1.0f);
+        // And rotate, why not..
+        gamestate->camera.rotation += t * 25.0f;
+
         if(t >= 1.0f)
         {
             if(!gamestate->fade_in)
@@ -162,6 +175,8 @@ UpdateGame(GameState *gamestate, f32 dt)
             else
             {
                 // Done
+                gamestate->camera.zoom = CAMERA_ZOOM;
+                gamestate->camera.rotation = 0;
                 gamestate->is_fading = false;
                 gamestate->player_can_move = true;
             }

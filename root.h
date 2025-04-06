@@ -11,6 +11,7 @@
 
 #define INTERNAL 1
 #define TARGET_FPS 60
+#define CAMERA_ZOOM 1.5f
 
 #include "types.h"
 #include "maths.h"
