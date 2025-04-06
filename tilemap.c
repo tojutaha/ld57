@@ -2,7 +2,7 @@
 #include "root.h"
 
 function void
-DrawMapAndEntities(Tilemap *map, f32 dt)
+DrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
 {
     for(u32 y = 0; y < MAP_HEIGHT; ++y)
     {
@@ -66,6 +66,7 @@ DrawMapAndEntities(Tilemap *map, f32 dt)
                         e->pressure_plate_active = false;
                         e->pressure_plate_timer = 0.0f;
                         e->collision_flag = CollisionFlag_Overlap;
+                        PlaySound(gamestate->blip2);
                     }
                 }
 

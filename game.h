@@ -16,6 +16,9 @@ typedef struct
 
     Texture2D texture_atlas;
 
+    Sound blip1;
+    Sound blip2;
+
     GameMode game_mode;
 
     Camera2D camera;

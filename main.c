@@ -18,11 +18,6 @@ int main(void)
 
         f32 dt = GetFrameTime();
 
-#if INTERNAL
-        if(IsKeyPressed(KEY_R))
-            NewGame(gamestate);
-#endif
-
         switch(gamestate->game_mode)
         {
             case GameMode_Game:

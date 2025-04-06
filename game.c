@@ -14,10 +14,12 @@ InitGame(GameState *gamestate)
     InitAudioDevice();
 
     gamestate->texture_atlas = LoadTexture("./resources/spritesheet.png");
+    gamestate->blip1 = LoadSound("./resources/blip1.wav");
+    gamestate->blip2 = LoadSound("./resources/blip2.wav");
+
     gamestate->game_mode = GameMode_MainMenu;
     
     NewGame(gamestate);
-
 }
 
 function void
@@ -173,7 +175,7 @@ RenderGame(GameState *gamestate, f32 dt)
     BeginMode2D(gamestate->camera);
 
     Tilemap *map = &gamestate->current_map;
-    DrawMapAndEntities(map, dt);
+    DrawMapAndEntities(gamestate, map, dt);
 
     AnimateEntity(&gamestate->player);
     DrawSprite(gamestate->texture_atlas, gamestate->player.sprite, PLAYER_WIDTH, PLAYER_HEIGHT);
