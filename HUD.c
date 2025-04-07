@@ -18,8 +18,8 @@ DrawCameraFade(GameState *gamestate)
     }
 }
 
-#define button_width 150
-#define button_height 50
+#define button_width 175
+#define button_height 75
 #define button_spacing 25
 
 function void
@@ -82,20 +82,30 @@ DrawEndMenu(GameState *gamestate)
     f32 total_height = button_height + button_spacing;
     f32 start_y = (gamestate->screen_height - total_height) * 0.5f;
 
-    const char *text = "Yep, thats all levels..";
-    f32 font_size = 40;
+    const char *text = "Every door you opened... brought you closer to closing this game.";
+    f32 font_size = 32;
     f32 text_width = MeasureText(text, font_size);
     DrawText(text, center_x - text_width*0.5f, start_y - button_width, font_size, WHITE);
 
-    Button exit_button =
+    Button restart_button =
     {
         .pos = (v2){ button_center_x, start_y },
-        .text = "MAIN MENU",
+        .text = "CLONE AGAIN?",
         .width = 150,
         .height = 50,
         .normal_color = BLUE,
         .hover_color = RED
     };
+
+    if(ButtonPressed(&restart_button, mouse_pos))
+    {
+        gamestate->game_mode = GameMode_Game;
+        NewGame(gamestate);
+    }
+
+    Button exit_button = restart_button;
+    exit_button.pos.y += button_height + button_spacing;
+    exit_button.text = "MAIN MENU";
 
     if(ButtonPressed(&exit_button, mouse_pos))
     {

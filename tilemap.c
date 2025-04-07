@@ -354,6 +354,20 @@ SetupLevel(GameState *gamestate, u32 level_num)
             return true;
         }
 
+        case 8:
+        {
+            // Same as above but more plates
+            AddClone(&gamestate->current_map, 6, 6);
+
+            AddPressurePlate(&gamestate->current_map, 3, 1, PlateColor_Blue);
+            AddPressurePlate(&gamestate->current_map, 7, 1, PlateColor_Blue);
+
+            AddPressurePlate(&gamestate->current_map, 3, 9, PlateColor_Green);
+            AddPressurePlate(&gamestate->current_map, 7, 9, PlateColor_Green);
+
+            return true;
+        }
+
         // TODO: Implement more levels
 
         default: return false;

@@ -236,17 +236,18 @@ MoveClone(GameState *gamestate, Entity *clone, Entity *player, f32 dt)
 {
     Tilemap *map = &gamestate->current_map;
 
-    // Keep the camera in the middle
-    v2 mid_point =
+    // Keep the camera in the middle until door is open
+    if(!gamestate->current_map.door_open)
     {
-        (player->pos.x + clone->pos.x) * 0.5f,
-        (player->pos.y + clone->pos.y) * 0.5f
-    };
-
-    gamestate->camera.target = mid_point;
+        v2 mid_point =
+        {
+            (player->pos.x + clone->pos.x) * 0.5f,
+            (player->pos.y + clone->pos.y) * 0.5f
+        };
+        gamestate->camera.target = mid_point;
+    }
 
     // Mirror the player vel/pos 
-
     clone->vel.x = -player->vel.x;
     clone->vel.y = -player->vel.y;
 
@@ -255,6 +256,7 @@ MoveClone(GameState *gamestate, Entity *clone, Entity *player, f32 dt)
 
     clone->sprite.pos = clone->pos;
     clone->dir = player->dir;
+    clone->sprite.anim_state = player->sprite.anim_state;
 
     // Check collision, we dont care anything but the specific pressure plates
     Rectangle clone_rect =

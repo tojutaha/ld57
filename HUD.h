@@ -54,7 +54,7 @@ ButtonPressed(Button *button, v2 mouse_pos)
     // Calculate text position to center it
     const s32 font_size = 20;
     Font font = GetFontDefault();
-    v2 text_size = MeasureTextEx(font, button->text, font_size, 0);
+    v2 text_size = MeasureTextEx(font, button->text, font_size, 2);
 
     v2 text_pos = {
         button->pos.x + (button->width - text_size.x) / 2,
@@ -62,7 +62,7 @@ ButtonPressed(Button *button, v2 mouse_pos)
     };
 
     // Draw button text
-    DrawTextEx(font, button->text, text_pos, font_size, 0, WHITE);
+    DrawTextEx(font, button->text, text_pos, font_size, 2, WHITE);
 
     return (button_state == ButtonStatePressed) ? true : false;
 }
