@@ -37,6 +37,7 @@ ResetPlates(Tilemap *map)
 function void
 UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
 {
+    // Draw map
     for(u32 y = 0; y < MAP_HEIGHT; ++y)
     {
         for(u32 x = 0; x < MAP_WIDTH; ++x)
@@ -50,6 +51,7 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
         }
     }
 
+    // Draw and update entities
     for(u32 entity_index = 0; entity_index < map->entity_count; ++entity_index)
     {
         Entity *e = map->entities + entity_index;
@@ -127,7 +129,8 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
 
                 if(e->activated)
                 {
-                    e->sprite.src.x = 96;
+                    // @HARDCODED
+                    e->sprite.src.x = 224;
                     v2 target = (v2){
                         PRESSURE_PLATE_SIZE - shrink_amount * 0.3f,
                         PRESSURE_PLATE_SIZE - shrink_amount
@@ -138,7 +141,8 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
                 }
                 else
                 {
-                    e->sprite.src.x = 32;
+                    // @HARDCODED
+                    e->sprite.src.x = 160;
                     v2 target = (v2){
                         PRESSURE_PLATE_SIZE-shrink_amount * 0.3f,
                         PRESSURE_PLATE_SIZE-shrink_amount
@@ -162,6 +166,13 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
                 };
 
                 DrawTexturePro(gamestate->texture_atlas, e->sprite.src, dst, (v2){0, 0}, 0.0f, WHITE);
+            } break;
+
+            case Clone:
+            {
+                MoveClone(gamestate, e, &gamestate->player, dt);
+                AnimateClone(e);
+                DrawSprite(gamestate->texture_atlas, e->sprite, PLAYER_WIDTH, PLAYER_HEIGHT);
             } break;
 
             default: break;
@@ -228,6 +239,7 @@ SetupLevel(GameState *gamestate, u32 level_num)
 {
     ResetTilemap(&gamestate->current_map);
     InitTilemap(&gamestate->current_map);
+    gamestate->plate_sequence.sequence_len = 0;
 
     switch(level_num)
     {
@@ -328,6 +340,16 @@ SetupLevel(GameState *gamestate, u32 level_num)
             e2->deactivation_time = 5.0f;
             AddPressurePlate(&gamestate->current_map, 9, 1, PlateColor_Orange);
             AddPressurePlate(&gamestate->current_map, 8, 2, PlateColor_Cyan);
+
+            return true;
+        }
+
+        case 7:
+        {
+            // Learn about the clone
+            AddClone(&gamestate->current_map, 6, 6);
+            AddPressurePlate(&gamestate->current_map, 3, 1, PlateColor_Blue);
+            AddPressurePlate(&gamestate->current_map, 7, 1, PlateColor_Green);
 
             return true;
         }

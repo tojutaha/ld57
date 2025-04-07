@@ -30,6 +30,7 @@ typedef enum
     Door,
     Wall,
     PressurePlate,
+    Clone,
 } EntityType;
 
 typedef enum

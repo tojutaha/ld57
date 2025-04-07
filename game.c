@@ -23,8 +23,7 @@ InitGame(GameState *gamestate)
     gamestate->door2 = LoadSound("./resources/door2.wav");
 
 #if INTERNAL
-    // gamestate->game_mode = GameMode_Game;
-    gamestate->game_mode = GameMode_EndMenu;
+    gamestate->game_mode = GameMode_Game;
 #else
     gamestate->game_mode = GameMode_MainMenu;
 #endif
@@ -186,7 +185,7 @@ RenderGame(GameState *gamestate, f32 dt)
     Tilemap *map = &gamestate->current_map;
     UpdateAndDrawMapAndEntities(gamestate, map, dt);
 
-    AnimateEntity(&gamestate->player);
+    AnimatePlayer(&gamestate->player);
     DrawSprite(gamestate->texture_atlas, gamestate->player.sprite, PLAYER_WIDTH, PLAYER_HEIGHT);
     EndMode2D();
 

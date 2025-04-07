@@ -48,9 +48,10 @@ int main(void)
     }
 
     UnloadTexture(gamestate->texture_atlas);
+    free(gamestate);
+
     CloseAudioDevice();
     CloseWindow();
-    free(gamestate);
 
     return 0;
 }

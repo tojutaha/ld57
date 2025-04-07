@@ -8,8 +8,8 @@ CheckCollision(Tilemap *map, Entity *player, v2 *velocity, Axis axis)
     {
         player->pos.x,
         player->pos.y + PLAYER_WIDTH,
-        PLAYER_WIDTH*0.25f,
-        PLAYER_HEIGHT*0.25f
+        PLAYER_WIDTH,
+        PLAYER_HEIGHT*0.5f
     };
 
     CollisionResult result = {0};
@@ -168,6 +168,12 @@ HandleOverlappingCollision(GameState *gamestate, Tilemap *map, Entity *e)
                 }
                 else
                 {
+                    // Only clone can trigger blue plates..
+                    if(e->plate_color == PlateColor_Blue)
+                    {
+                        return;
+                    }
+
                     if(!e->activated)
                     {
                         e->activated = true;
