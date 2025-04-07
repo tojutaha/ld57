@@ -260,8 +260,9 @@ done_beam:
                 DrawLineEx(start, end, 4.0f, YELLOW);
 
                 // TODO: Change to sprite
-                Rectangle rect = { e->pos.x, e->pos.y, TILE_WIDTH, TILE_HEIGHT };
-                DrawRectangleRec(rect, RED);
+                // Rectangle rect = { e->pos.x, e->pos.y, TILE_WIDTH, TILE_HEIGHT };
+                // DrawRectangleRec(rect, RED);
+                DrawTextureRec(gamestate->texture_atlas, e->sprite.src, e->pos, WHITE);
 
                 if(end_this)
                 {
