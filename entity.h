@@ -67,5 +67,8 @@ typedef struct
     f32 alpha;
 
     b32 collision_handled_in_this_frame;
+
+    // Ugh..
+    b32 reflecting;
 } Entity;
 

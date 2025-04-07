@@ -237,6 +237,31 @@ AddBeamEmitter(Tilemap *map, s32 x, s32 y, Direction dir)
     map->active_entity_count++;
 }
 
+function void
+AddMirror(Tilemap *map, s32 x, s32 y, Direction dir)
+{
+    v2 pos = { x * TILE_WIDTH, y * TILE_HEIGHT };
+    // TODO Sprite
+
+    Entity e =
+    {
+        .pos = pos,
+        .vel = Vector2Zero(),
+        .speed = 0,
+        .type = Mirror,
+        .collision_flag = CollisionFlag_Overlap,
+        .activated = false,
+        .has_timer = false,
+        .deactivation_time = 0,
+        .timer = 0,
+        .dir = dir
+        // .sprite = sprite
+    };
+
+    map->entities[map->entity_count++] = e;
+    map->active_entity_count++;
+}
+
 //
 //
 //

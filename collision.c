@@ -190,6 +190,7 @@ HandleOverlappingCollision(GameState *gamestate, Tilemap *map, Entity *e)
         } break;
 
         case BeamEmitter:
+        case Mirror:
         {
             if(!e->activated)
             {
