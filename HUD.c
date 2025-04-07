@@ -47,6 +47,17 @@ RenderHUD(GameState *gamestate)
 {
     DrawText(TextFormat("LEVEL: %d", gamestate->level_num+1), 20, 20, 20, GREEN);
     RenderColorSequence(gamestate);
+
+    if(global_show_tootip)
+    {
+        f32 x = gamestate->screen_width - 20;
+        f32 y = gamestate->screen_height - 20;
+
+        f32 font_size = 20.0f;
+        const char *text = "E to rotate";
+        f32 text_width = MeasureText(text, font_size);
+        DrawText("E to rotate", x - text_width, y, font_size, WHITE);
+    }
 }
 
 function void

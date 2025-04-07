@@ -1,6 +1,6 @@
 @echo off
 
-set "IsDebug=1"
+set "IsDebug=0"
 
 set Includes= /Iexternal/raylib/include/
 

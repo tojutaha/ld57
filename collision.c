@@ -200,6 +200,7 @@ HandleOverlappingCollision(GameState *gamestate, Tilemap *map, Entity *e)
                     e->dir = (Direction)((e->dir + 1) % 4);
                 }
             }
+
         } break;
 
         default: break;

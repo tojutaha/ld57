@@ -100,6 +100,11 @@ UpdateGame(GameState *gamestate, f32 dt)
         Entity *e = collision_result_x.collided_entity;
         if(e)
         {
+            // umm..
+            if(!e->activated && (e->type == Mirror || e->type == BeamEmitter))
+            {
+                global_show_tootip = true;
+            }
             if(!e->collision_handled_in_this_frame)
             {
                 HandleOverlappingCollision(gamestate, map, collision_result_x.collided_entity);
@@ -111,14 +116,27 @@ UpdateGame(GameState *gamestate, f32 dt)
             }
         }
     }
+    else
+    {
+        global_show_tootip = false;
+    }
 
     if(collision_result_y.overlapping)
     {
         Entity *e = collision_result_y.collided_entity;
         if(e && !e->collision_handled_in_this_frame)
         {
+            // umm..
+            if(!e->activated && (e->type == Mirror || e->type == BeamEmitter))
+            {
+                global_show_tootip = true;
+            }
             HandleOverlappingCollision(gamestate, map, collision_result_y.collided_entity);
         }
+    }
+    else
+    {
+        global_show_tootip = false;
     }
 
     player->sprite.pos = player->pos;

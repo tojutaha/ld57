@@ -9,7 +9,7 @@
 #include <string.h>
 #include <math.h>
 
-#define INTERNAL 1
+#define INTERNAL 0
 #define TARGET_FPS 60
 #define CAMERA_ZOOM 1.5f
 
@@ -23,6 +23,7 @@
 #include "game.h"
 
 global b32 global_running;
+global b32 global_show_tootip;
 
 #include "sprite.c"
 #include "entity.c"
