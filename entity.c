@@ -245,6 +245,8 @@ MoveClone(GameState *gamestate, Entity *clone, Entity *player, f32 dt)
 
     gamestate->camera.target = mid_point;
 
+    // Mirror the player vel/pos 
+
     clone->vel.x = -player->vel.x;
     clone->vel.y = -player->vel.y;
 
@@ -254,6 +256,7 @@ MoveClone(GameState *gamestate, Entity *clone, Entity *player, f32 dt)
     clone->sprite.pos = clone->pos;
     clone->dir = player->dir;
 
+    // Check collision, we dont care anything but the specific pressure plates
     Rectangle clone_rect =
     {
         clone->pos.x,
@@ -262,7 +265,6 @@ MoveClone(GameState *gamestate, Entity *clone, Entity *player, f32 dt)
         PLAYER_HEIGHT*0.5f
     };
 
-    // Check collision, we dont care anything but the specific pressure plates
     for(u32 i = 0; i < map->entity_count; ++i)
     {
         Entity *e = &map->entities[i];

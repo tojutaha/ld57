@@ -8,6 +8,7 @@ int main(void)
     memset(gamestate, 0, sizeof *gamestate);
 
     InitGame(gamestate);
+
 #if !INTERNAL
     SetExitKey(0);
 #endif

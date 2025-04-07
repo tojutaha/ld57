@@ -35,10 +35,11 @@ DrawMainMenu(GameState *gamestate)
     f32 total_height = button_height * 2 + button_spacing;
     f32 start_y = (gamestate->screen_height - total_height) * 0.5f;
 
-    const char *text = "TITLE";
-    f32 font_size = 40;
-    f32 text_width = MeasureText(text, font_size);
-    DrawText(text, center_x - text_width*0.5f, start_y - button_width, font_size, WHITE);
+    Rectangle src = { 160, 192, 320, 63 };
+    f32 dst_width = 480.0f;
+    f32 dst_height = 128.0f;
+    Rectangle dst = { center_x - (dst_width * 0.5f), start_y - 175.0f, dst_width, dst_height };
+    DrawTexturePro(gamestate->texture_atlas, src, dst, Vector2Zero(), 5.0f, WHITE);
 
     Button new_game_button =
     {

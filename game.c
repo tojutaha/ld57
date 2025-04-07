@@ -7,9 +7,8 @@ InitGame(GameState *gamestate)
     gamestate->screen_width = 1200;
     gamestate->screen_height = 900;
 
-    // SetConfigFlags(FLAG_VSYNC_HINT|FLAG_MSAA_4X_HINT);
     SetConfigFlags(FLAG_VSYNC_HINT);
-    InitWindow(gamestate->screen_width, gamestate->screen_height, "LD57");
+    InitWindow(gamestate->screen_width, gamestate->screen_height, "Clone Alone");
     SetTargetFPS(TARGET_FPS);
 
     InitAudioDevice();
@@ -23,7 +22,8 @@ InitGame(GameState *gamestate)
     gamestate->door2 = LoadSound("./resources/door2.wav");
 
 #if INTERNAL
-    gamestate->game_mode = GameMode_Game;
+    // gamestate->game_mode = GameMode_Game;
+    gamestate->game_mode = GameMode_MainMenu;
 #else
     gamestate->game_mode = GameMode_MainMenu;
 #endif
