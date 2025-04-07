@@ -258,10 +258,6 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
 done_beam:
                 end = current;
                 DrawLineEx(start, end, 4.0f, YELLOW);
-
-                // TODO: Change to sprite
-                // Rectangle rect = { e->pos.x, e->pos.y, TILE_WIDTH, TILE_HEIGHT };
-                // DrawRectangleRec(rect, RED);
                 DrawTextureRec(gamestate->texture_atlas, e->sprite.src, e->pos, WHITE);
 
                 if(end_this)
@@ -347,9 +343,16 @@ done_mirror:
                     DrawLineEx(start, end, 4.0f, YELLOW);
                 }
 
-                // TODO: Change to sprite
-                Rectangle rect = { e->pos.x, e->pos.y, TILE_WIDTH, TILE_HEIGHT };
-                DrawRectangleRec(rect, BLUE);
+                switch(e->dir)
+                {
+                    case Left: e->sprite.src.x = 0; break;
+                    case Up: e->sprite.src.x = 64; break;
+                    case Right: e->sprite.src.x = 128; break;
+                    case Down: e->sprite.src.x = 192; break;
+
+                }
+
+                DrawTextureRec(gamestate->texture_atlas, e->sprite.src, e->pos, WHITE);
             } break;
 
             default: break;

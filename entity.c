@@ -216,7 +216,7 @@ function void
 AddBeamEmitter(Tilemap *map, s32 x, s32 y, Direction dir)
 {
     v2 pos = { x * TILE_WIDTH, y * TILE_HEIGHT };
-    // TODO Sprite
+
     Sprite sprite = {0};
     sprite.src = (Rectangle){ 0, 512, TILE_WIDTH, TILE_HEIGHT };
 
@@ -243,7 +243,9 @@ function void
 AddMirror(Tilemap *map, s32 x, s32 y, Direction dir)
 {
     v2 pos = { x * TILE_WIDTH, y * TILE_HEIGHT };
-    // TODO Sprite
+
+    Sprite sprite = {0};
+    sprite.src = (Rectangle){ 0, 896, TILE_WIDTH, TILE_HEIGHT };
 
     Entity e =
     {
@@ -256,8 +258,8 @@ AddMirror(Tilemap *map, s32 x, s32 y, Direction dir)
         .has_timer = false,
         .deactivation_time = 0,
         .timer = 0,
-        .dir = dir
-        // .sprite = sprite
+        .dir = dir,
+        .sprite = sprite
     };
 
     map->entities[map->entity_count++] = e;
