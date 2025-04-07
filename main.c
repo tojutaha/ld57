@@ -23,6 +23,10 @@ int main(void)
         {
             case GameMode_Game:
             {
+#if INTERNAL
+                if(IsKeyPressed(KEY_UP))
+                    IncrementLevel(gamestate);
+#endif
                 if(IsKeyPressed(KEY_ESCAPE))
                     gamestate->game_mode = GameMode_MainMenu;
 

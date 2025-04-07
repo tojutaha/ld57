@@ -125,11 +125,55 @@ HandleOverlappingCollision(GameState *gamestate, Tilemap *map, Entity *e)
         {
             case PressurePlate:
             {
-                if(!e->activated)
+                if(gamestate->plate_sequence.sequence_len > 0)
                 {
-                    e->activated = true;
-                    e->collision_flag = CollisionFlag_None;
-                    PlaySound(gamestate->blip1);
+                    if(!e->activated)
+                    {
+                        e->activated = true;
+                        e->collision_flag = CollisionFlag_None;
+
+                        // Check sequence
+                        PlateSequence *seq = &gamestate->plate_sequence;
+
+                        if(seq->sequence_failed || seq->sequence_completed)
+                            return;
+
+                        if(e->plate_color == seq->color_sequence[seq->current_index])
+                        {
+                            seq->current_index++;
+
+                            if(seq->current_index >= seq->sequence_len)
+                            {
+                                // Success
+                                seq->sequence_completed = true;
+                                PlaySound(gamestate->door1);
+                            }
+                            else
+                            {
+                                // Correct step
+                                PlaySound(gamestate->blip1);
+                            }
+                        }
+                        else
+                        {
+                            // Failure
+                            if(seq->current_index > 0)
+                                PlaySound(gamestate->door2);
+
+                            seq->sequence_failed = false;
+                            seq->current_index = 0;
+                            ResetPlates(map);
+                        }
+                    }
+                }
+                else
+                {
+                    if(!e->activated)
+                    {
+                        e->activated = true;
+                        e->collision_flag = CollisionFlag_None;
+                        PlaySound(gamestate->blip1);
+                    }
                 }
             } break;
 

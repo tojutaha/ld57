@@ -20,6 +20,21 @@ IsAllEntitiesActivated(Tilemap *map)
 }
 
 function void
+ResetPlates(Tilemap *map)
+{
+    for(u32 i = 0; i < map->entity_count; ++i)
+    {
+        Entity *entity = &map->entities[i];
+        if(entity->type == PressurePlate)
+        {
+            entity->activated = false;
+            entity->collision_flag = CollisionFlag_Overlap;
+            entity->timer = 0;
+        }
+    }
+}
+
+function void
 UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
 {
     for(u32 y = 0; y < MAP_HEIGHT; ++y)
@@ -47,8 +62,16 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
 
             case Door:
             {
+                if(gamestate->plate_sequence.sequence_len > 0)
+                {
+                    map->door_open = gamestate->plate_sequence.sequence_completed;
+                }
+                else
+                {
+                    map->door_open = IsAllEntitiesActivated(map);
+                }
+
                 v2 target_pos = e->pos;
-                map->door_open = IsAllEntitiesActivated(map);
                 if(map->door_open)
                 {
                     if(e->collision_flag & CollisionFlag_Block)
@@ -91,6 +114,14 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
                         e->timer = 0.0f;
                         e->collision_flag = CollisionFlag_Overlap;
                         PlaySound(gamestate->blip2);
+
+                        if(gamestate->plate_sequence.sequence_len > 0)
+                        {
+                            gamestate->plate_sequence.sequence_completed = false;
+                            gamestate->plate_sequence.sequence_failed = false;
+                            gamestate->plate_sequence.current_index = 0;
+                            ResetPlates(map);
+                        }
                     }
                 }
 
@@ -216,6 +247,32 @@ SetupLevel(GameState *gamestate, u32 level_num)
             Entity * e = AddPressurePlate(&gamestate->current_map, 3, 3, PlateColor_Red);
             e->has_timer = true;
             e->deactivation_time = 2.5f;
+
+            return true;
+        }
+
+        case 2:
+        {
+            // Little variation for next level; Learn about the sequences without timer
+            PlateColor level_sequence[] = { PlateColor_Blue, PlateColor_Green, PlateColor_Blue };
+            InitColorSequence(&gamestate->plate_sequence, level_sequence, 3);
+            AddPressurePlate(&gamestate->current_map, 3, 3, PlateColor_Blue);
+            AddPressurePlate(&gamestate->current_map, 1, 1, PlateColor_Green);
+            AddPressurePlate(&gamestate->current_map, 2, 2, PlateColor_Blue);
+
+            return true;
+        }
+
+        case 3:
+        {
+            // Little variation for next level; Learn about the sequences with timer
+            PlateColor level_sequence[] = { PlateColor_Red, PlateColor_Green, PlateColor_Blue };
+            InitColorSequence(&gamestate->plate_sequence, level_sequence, 3);
+            Entity * e = AddPressurePlate(&gamestate->current_map, 3, 3, PlateColor_Red);
+            e->has_timer = true;
+            e->deactivation_time = 5.0f;
+            AddPressurePlate(&gamestate->current_map, 1, 1, PlateColor_Green);
+            AddPressurePlate(&gamestate->current_map, 2, 2, PlateColor_Blue);
 
             return true;
         }

@@ -1,6 +1,17 @@
 #pragma once
 #include "root.h"
 
+#define MAX_SEQUENCE_LEN 8
+
+typedef struct
+{
+    PlateColor color_sequence[MAX_SEQUENCE_LEN];
+    u32 sequence_len;
+    u32 current_index;
+    b32 sequence_failed;
+    b32 sequence_completed;
+} PlateSequence;
+
 typedef enum
 {
     GameMode_Game,
@@ -37,4 +48,17 @@ typedef struct
 
     u32 level_num;
 
+    PlateSequence plate_sequence;
+
 } GameState;
+
+function void
+InitColorSequence(PlateSequence *seq, PlateColor *colors, u32 count)
+{
+    seq->sequence_len = count;
+    seq->current_index = 0;
+    seq->sequence_failed = false;
+    seq->sequence_completed = false;
+    for(u32 i = 0; i < count; ++i)
+        seq->color_sequence[i] = colors[i];
+}
