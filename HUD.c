@@ -2,9 +2,51 @@
 #include "root.h"
 
 function void
+RenderColorSequence(GameState *gamestate)
+{
+    PlateSequence *seq = &gamestate->plate_sequence;
+    if(seq->sequence_len <= 0)
+        return;
+
+    f32 box_size = 30;
+    f32 spacing = 10;
+    f32 total_width = seq->sequence_len * box_size + (seq->sequence_len - 1) * spacing;
+    f32 start_x = (gamestate->screen_width - total_width) * 0.5f;
+    f32 y = 20;
+
+    for(u32 i = 0; i < seq->sequence_len; ++i)
+    {
+        Color color = RED;
+
+        switch(seq->color_sequence[i])
+        {
+            case PlateColor_Red: color = RED; break;
+            case PlateColor_Green: color = GREEN; break;
+            case PlateColor_Blue: color = BLUE; break;
+            case PlateColor_Yellow: color = YELLOW; break;
+            case PlateColor_Purple: color = PURPLE; break;
+            case PlateColor_White: color = WHITE; break;
+            case PlateColor_Orange: color = ORANGE; break;
+            case PlateColor_Cyan: color = SKYBLUE; break;
+            }
+
+        Rectangle rect =
+        {
+            start_x + i * (box_size + spacing), y,
+            box_size, box_size
+        };
+
+        DrawRectangleRounded(rect, 0.2f, 6, color);
+        if(i == seq->current_index)
+            DrawRectangleLinesEx(rect, 2.0f, WHITE);
+    }
+}
+
+function void
 RenderHUD(GameState *gamestate)
 {
     DrawText(TextFormat("LEVEL: %d", gamestate->level_num+1), 20, 20, 20, GREEN);
+    RenderColorSequence(gamestate);
 }
 
 function void
