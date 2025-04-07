@@ -169,8 +169,8 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
     }
 
     // Door frame
-    Rectangle frame_rect = { 128, 576, 64, 64 };
-    v2 frame_pos = { (TILE_WIDTH * MAP_WIDTH) * 0.5f, 0 };
+    Rectangle frame_rect = { 288, 64, 64, 64 };
+    v2 frame_pos = { (TILE_WIDTH * MAP_WIDTH) * 0.5f - 32, 0 };
     DrawTextureRec(gamestate->texture_atlas, frame_rect, frame_pos, WHITE);
 }
 
@@ -234,14 +234,23 @@ SetupLevel(GameState *gamestate, u32 level_num)
         case 0:
         {
             // Default first level; Learn about the plates and door
-            AddPressurePlate(&gamestate->current_map, 1, 1, PlateColor_Green);
+            AddPressurePlate(&gamestate->current_map, 2, 1, PlateColor_Green);
 
             return true;
         }
 
         case 1:
         {
-            // Little variation for next level; Learn about the timers
+            // Learn about multiple plates
+            AddPressurePlate(&gamestate->current_map, 2, 1, PlateColor_Green);
+            AddPressurePlate(&gamestate->current_map, 8, 1, PlateColor_Green);
+
+            return true;
+        }
+
+        case 2:
+        {
+            // Learn about the timers
             AddPressurePlate(&gamestate->current_map, 1, 1, PlateColor_Green);
             AddPressurePlate(&gamestate->current_map, 2, 2, PlateColor_Green);
             Entity * e = AddPressurePlate(&gamestate->current_map, 3, 3, PlateColor_Red);
@@ -251,31 +260,53 @@ SetupLevel(GameState *gamestate, u32 level_num)
             return true;
         }
 
-        case 2:
+        case 3:
         {
-            // Little variation for next level; Learn about the sequences without timer
-            PlateColor level_sequence[] = { PlateColor_Blue, PlateColor_Green, PlateColor_Blue };
-            InitColorSequence(&gamestate->plate_sequence, level_sequence, 3);
-            AddPressurePlate(&gamestate->current_map, 3, 3, PlateColor_Blue);
-            AddPressurePlate(&gamestate->current_map, 1, 1, PlateColor_Green);
-            AddPressurePlate(&gamestate->current_map, 2, 2, PlateColor_Blue);
+            // Learn about the sequences without timer
+            PlateColor level_sequence[] = { PlateColor_Yellow, PlateColor_Green, PlateColor_Purple };
+            InitColorSequence(&gamestate->plate_sequence, level_sequence, ArrayCount(level_sequence));
+            AddPressurePlate(&gamestate->current_map, 7, 3, PlateColor_Yellow);
+            AddPressurePlate(&gamestate->current_map, 9, 1, PlateColor_Green);
+            AddPressurePlate(&gamestate->current_map, 8, 2, PlateColor_Purple);
 
             return true;
         }
 
-        case 3:
+        case 4:
+        {
+            // Same as above but with more colors
+            PlateColor level_sequence[] =
+            {
+                PlateColor_Green, PlateColor_Purple, PlateColor_Yellow,
+                PlateColor_White, PlateColor_Orange, PlateColor_Cyan
+            };
+            InitColorSequence(&gamestate->plate_sequence, level_sequence, ArrayCount(level_sequence));
+
+            AddPressurePlate(&gamestate->current_map, 1, 1, PlateColor_Green);
+            AddPressurePlate(&gamestate->current_map, 2, 2, PlateColor_Purple);
+            AddPressurePlate(&gamestate->current_map, 3, 3, PlateColor_Yellow);
+
+            AddPressurePlate(&gamestate->current_map, 7, 3, PlateColor_White);
+            AddPressurePlate(&gamestate->current_map, 9, 1, PlateColor_Orange);
+            AddPressurePlate(&gamestate->current_map, 8, 2, PlateColor_Cyan);
+            return true;
+        }
+
+        case 5:
         {
             // Little variation for next level; Learn about the sequences with timer
-            PlateColor level_sequence[] = { PlateColor_Red, PlateColor_Green, PlateColor_Blue };
-            InitColorSequence(&gamestate->plate_sequence, level_sequence, 3);
+            PlateColor level_sequence[] = { PlateColor_Red, PlateColor_Green, PlateColor_Yellow };
+            InitColorSequence(&gamestate->plate_sequence, level_sequence, ArrayCount(level_sequence));
             Entity * e = AddPressurePlate(&gamestate->current_map, 3, 3, PlateColor_Red);
             e->has_timer = true;
             e->deactivation_time = 5.0f;
             AddPressurePlate(&gamestate->current_map, 1, 1, PlateColor_Green);
-            AddPressurePlate(&gamestate->current_map, 2, 2, PlateColor_Blue);
+            AddPressurePlate(&gamestate->current_map, 2, 2, PlateColor_Yellow);
 
             return true;
         }
+
+        // TODO: 6 Same as 4 but more colors with timer (harder)?
 
         // TODO: Implement more levels
 

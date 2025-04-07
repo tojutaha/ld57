@@ -32,3 +32,5 @@ typedef int32_t b32;
 #else
 #define Assert(Expr)
 #endif
+
+#define ArrayCount(Array) (sizeof(Array) / sizeof((Array)[0]))

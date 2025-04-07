@@ -9,6 +9,11 @@ typedef enum
     PlateColor_Red,
     PlateColor_Green,
     PlateColor_Blue,
+    PlateColor_Yellow,
+    PlateColor_Purple,
+    PlateColor_White,
+    PlateColor_Orange,
+    PlateColor_Cyan,
 } PlateColor;
 
 typedef enum

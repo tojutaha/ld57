@@ -23,7 +23,7 @@ CheckCollision(Tilemap *map, Entity *player, v2 *velocity, Axis axis)
         {
             case PressurePlate:
             {
-                entity_rect = (Rectangle){ other->pos.x, other->pos.y, PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
+                entity_rect = (Rectangle){ other->pos.x, other->pos.y, PRESSURE_PLATE_SIZE-10, PRESSURE_PLATE_SIZE-10 };
             } break;
 
             default:
@@ -158,11 +158,13 @@ HandleOverlappingCollision(GameState *gamestate, Tilemap *map, Entity *e)
                         {
                             // Failure
                             if(seq->current_index > 0)
+                            {
                                 PlaySound(gamestate->door2);
+                            }
 
+                            ResetPlates(map);
                             seq->sequence_failed = false;
                             seq->current_index = 0;
-                            ResetPlates(map);
                         }
                     }
                 }

@@ -1,8 +1,8 @@
 #pragma once
 #include "root.h"
 
-#define MAP_HEIGHT 12
-#define MAP_WIDTH 12
+#define MAP_HEIGHT 13
+#define MAP_WIDTH 13
 #define TILE_WIDTH 64
 #define TILE_HEIGHT 64
 

@@ -49,6 +49,31 @@ AddPressurePlate(Tilemap *map, s32 x, s32 y, PlateColor color)
         {
             sprite.src = (Rectangle){ 32, 448, PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
         } break;
+
+        case PlateColor_Yellow:
+        {
+            sprite.src = (Rectangle){ 32, 512, PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
+        } break;
+
+        case PlateColor_Purple:
+        {
+            sprite.src = (Rectangle){ 32, 576, PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
+        } break;
+
+        case PlateColor_White:
+        {
+            sprite.src = (Rectangle){ 32, 640, PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
+        } break;
+
+        case PlateColor_Orange:
+        {
+            sprite.src = (Rectangle){ 32, 704, PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
+        } break;
+
+        case PlateColor_Cyan:
+        {
+            sprite.src = (Rectangle){ 32, 768, PRESSURE_PLATE_SIZE, PRESSURE_PLATE_SIZE };
+        } break;
     }
 
     Entity e =
@@ -76,7 +101,7 @@ function void
 AddWall(Tilemap *map, s32 x, s32 y)
 {
     Sprite sprite = {0};
-    sprite.src = (Rectangle){ 32, 576, TILE_WIDTH, TILE_HEIGHT };
+    sprite.src = (Rectangle){ 192, 64, TILE_WIDTH, TILE_HEIGHT };
     Entity e =
     {
         .pos = (v2){ x, y },
@@ -99,7 +124,7 @@ AddDoor(Tilemap *map, s32 x, s32 y)
 {
     v2 pos = { x, y };
     Sprite sprite = {0};
-    sprite.src = (Rectangle){ 224, 576, TILE_WIDTH, TILE_HEIGHT };
+    sprite.src = (Rectangle){ 384, 64, TILE_WIDTH, TILE_HEIGHT };
     sprite.pos = pos;
 
     Entity e =
