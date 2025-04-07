@@ -317,6 +317,12 @@ AnimatePlayer(Entity *e)
 function void
 MoveClone(GameState *gamestate, Entity *clone, Entity *player, f32 dt)
 {
+    // Who knows..
+    if(gamestate->level_num == LAST_LEVEL)
+    {
+        return;
+    }
+
     Tilemap *map = &gamestate->current_map;
 
     // Keep the camera in the middle until door is open

@@ -1,6 +1,7 @@
 #pragma once
 #include "root.h"
 
+#define LAST_LEVEL 9
 #define MAX_SEQUENCE_LEN 8
 
 typedef struct

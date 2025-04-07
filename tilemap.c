@@ -206,6 +206,7 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
                 v2 current = start;
                 f32 step = 8.0f;
                 v2 end = start;
+                b32 end_this = false;
 
                 for(u32 i = 0; i < 100; ++i)
                 {
@@ -217,10 +218,19 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
                         Entity *entity = &map->entities[j];
                         Rectangle entity_rect = { entity->pos.x, entity->pos.y, TILE_WIDTH, TILE_HEIGHT };
 
+                        if(gamestate->level_num == LAST_LEVEL && entity->type == Clone)
+                        {
+                            if(CheckCollisionPointRec(current, entity_rect))
+                            {
+                                end_this = true;
+                                goto done_beam;
+                            }
+                        }
+
                         if(entity->type == Wall)
                         {
                             if(CheckCollisionPointRec(current, entity_rect))
-                                goto done;
+                                goto done_beam;
                         }
                         else if(entity->type == Door)
                         {
@@ -228,28 +238,35 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
                             {
                                 map->door_open = true;
                                 e->activated = true; // Activate this entity, so it will trigger the door
-                                goto done;
+                                goto done_beam;
                             }
                         }
                         else if(entity->type == Mirror)
                         {
                             if(CheckCollisionPointRec(current, entity_rect))
                             {
+                                if(!entity->reflecting)
+                                    PlaySound(gamestate->blip1);
                                 entity->reflecting = true;
                                 e->activated = true; // Activate this entity, so it will trigger the door
-                                goto done;
+                                goto done_beam;
                             }
                         }
                     }
                 }
 
-done:
+done_beam:
                 end = current;
                 DrawLineEx(start, end, 4.0f, YELLOW);
 
                 // TODO: Change to sprite
                 Rectangle rect = { e->pos.x, e->pos.y, TILE_WIDTH, TILE_HEIGHT };
                 DrawRectangleRec(rect, RED);
+
+                if(end_this)
+                {
+                    gamestate->game_mode = GameMode_EndMenu;
+                }
 
             } break;
 
@@ -407,14 +424,6 @@ SetupLevel(GameState *gamestate, u32 level_num)
             // Default first level; Learn about the plates and door
             AddPressurePlate(&gamestate->current_map, 2, 1, PlateColor_Green);
 
-            // AddBeamEmitter(&gamestate->current_map, 3, 5, Left);
-            // AddMirror(&gamestate->current_map, 6, 5, Right);
-
-
-            // AddBeamEmitter(&gamestate->current_map, 5, 5, Down);
-            // AddBeamEmitter(&gamestate->current_map, 5, 5, Left);
-            // AddBeamEmitter(&gamestate->current_map, 5, 5, Right);
-
             return true;
         }
 
@@ -511,7 +520,24 @@ SetupLevel(GameState *gamestate, u32 level_num)
             return true;
         }
 
+
         case 7:
+        {
+            // Learn about the emitter and mirrors
+            AddBeamEmitter(&gamestate->current_map, 3, 5, Left);
+            AddMirror(&gamestate->current_map, 6, 5, Right);
+
+            return true;
+        }
+
+        // MORE MIRRORS
+#if 0
+        case 8:
+        {
+            return true;
+        }
+
+        case 8:
         {
             // Learn about the clone
             AddClone(&gamestate->current_map, 6, 6);
@@ -520,10 +546,11 @@ SetupLevel(GameState *gamestate, u32 level_num)
 
             return true;
         }
+#endif
 
         case 8:
         {
-            // Same as above but more plates
+            // Learn about the clone and save the clone!??!
             AddClone(&gamestate->current_map, 6, 6);
 
             AddPressurePlate(&gamestate->current_map, 3, 1, PlateColor_Blue);
@@ -535,7 +562,13 @@ SetupLevel(GameState *gamestate, u32 level_num)
             return true;
         }
 
-        // TODO: Implement more levels
+        case 9:
+        {
+            AddBeamEmitter(&gamestate->current_map, 6, 5, Left);
+            v2 clone_pos = { 6 * TILE_WIDTH + TILE_WIDTH * 0.25f, 3 * TILE_HEIGHT };
+            AddCloneV(&gamestate->current_map, clone_pos);
+            return true;
+        }
 
         default: return false;
     }
