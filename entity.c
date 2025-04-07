@@ -62,6 +62,7 @@ AddPressurePlate(Tilemap *map, s32 x, s32 y, PlateColor color)
         .has_timer = false,
         .deactivation_time = 0,
         .timer = 0,
+        .plate_color = color,
         .sprite = sprite
     };
 

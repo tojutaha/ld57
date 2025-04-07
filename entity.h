@@ -47,6 +47,8 @@ typedef struct
     Direction dir;
     CollisionFlag collision_flag;
 
+    PlateColor plate_color;
+
     b32 activated;
 
     b32 has_timer;
