@@ -63,6 +63,39 @@ AddClone(Tilemap *map, s32 x, s32 y)
     map->entities[map->entity_count++] = e;
 }
 
+function void
+AddCloneV(Tilemap *map, v2 pos)
+{
+    Sprite sprite =
+    {
+        .src = (Rectangle){ 0, 256, 32, 64 },
+        .anim_state = AnimState_Idle,
+        .current_frame = 0,
+        .frame_counter = 0,
+        .pos = pos,
+    };
+
+    Entity e =
+    {
+        .pos = pos,// (v2){ x, y },
+        .vel = Vector2Zero(),
+        .speed = 0,
+        .type = Clone,
+        .collision_flag = CollisionFlag_None, // No need to have a flag,
+                                              // we just loop over the pressure plates in
+                                              // MoveClone
+        .activated = false,
+        .has_timer = false,
+        .deactivation_time = 0,
+        .timer = 0,
+        .sprite = sprite
+    };
+
+    e.speed = 1;
+
+    map->entities[map->entity_count++] = e;
+}
+
 function Entity *
 AddPressurePlate(Tilemap *map, s32 x, s32 y, PlateColor color)
 {

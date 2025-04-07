@@ -385,9 +385,10 @@ NewGame(GameState *gamestate)
 {
     gamestate->fade_timer = 0;
     gamestate->level_num = 0;
-    SetupLevel(gamestate, gamestate->level_num);
 
     gamestate->player = AddPlayer(gamestate);
     gamestate->player_can_move = true;
+
+    SetupLevel(gamestate, gamestate->level_num);
 }
 
