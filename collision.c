@@ -8,8 +8,8 @@ CheckCollision(Tilemap *map, Entity *player, v2 *velocity, Axis axis)
     {
         player->pos.x,
         player->pos.y + PLAYER_WIDTH,
-        PLAYER_WIDTH,
-        PLAYER_HEIGHT*0.5
+        PLAYER_WIDTH*0.25f,
+        PLAYER_HEIGHT*0.25f
     };
 
     CollisionResult result = {0};
@@ -158,9 +158,7 @@ HandleOverlappingCollision(GameState *gamestate, Tilemap *map, Entity *e)
                         {
                             // Failure
                             if(seq->current_index > 0)
-                            {
                                 PlaySound(gamestate->door2);
-                            }
 
                             ResetPlates(map);
                             seq->sequence_failed = false;
