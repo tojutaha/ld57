@@ -23,7 +23,8 @@ InitGame(GameState *gamestate)
     gamestate->door2 = LoadSound("./resources/door2.wav");
 
 #if INTERNAL
-    gamestate->game_mode = GameMode_Game;
+    // gamestate->game_mode = GameMode_Game;
+    gamestate->game_mode = GameMode_EndMenu;
 #else
     gamestate->game_mode = GameMode_MainMenu;
 #endif

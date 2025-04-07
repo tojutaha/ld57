@@ -18,6 +18,10 @@ DrawCameraFade(GameState *gamestate)
     }
 }
 
+#define button_width 150
+#define button_height 50
+#define button_spacing 25
+
 function void
 DrawMainMenu(GameState *gamestate)
 {
@@ -26,12 +30,22 @@ DrawMainMenu(GameState *gamestate)
 
     v2 mouse_pos = GetMousePosition();
 
+    f32 center_x = gamestate->screen_width * 0.5f;
+    f32 button_center_x = (gamestate->screen_width - button_width) * 0.5f;
+    f32 total_height = button_height * 2 + button_spacing;
+    f32 start_y = (gamestate->screen_height - total_height) * 0.5f;
+
+    const char *text = "TITLE";
+    f32 font_size = 40;
+    f32 text_width = MeasureText(text, font_size);
+    DrawText(text, center_x - text_width*0.5f, start_y - button_width, font_size, WHITE);
+
     Button new_game_button =
     {
-        .pos = (v2){ 10, 10 },
+        .pos = (v2){ button_center_x, start_y },
         .text = "NEW GAME",
-        .width = 150,
-        .height = 50,
+        .width = button_width,
+        .height = button_height,
         .normal_color = BLUE,
         .hover_color = RED
     };
@@ -43,7 +57,7 @@ DrawMainMenu(GameState *gamestate)
     }
 
     Button exit_button = new_game_button;
-    exit_button.pos.y += 75;
+    exit_button.pos.y += button_height + button_spacing;
     exit_button.text = "EXIT GAME";
 
     if(ButtonPressed(&exit_button, mouse_pos))
@@ -62,11 +76,19 @@ DrawEndMenu(GameState *gamestate)
 
     v2 mouse_pos = GetMousePosition();
 
-    DrawText("Yep, thats all levels.. for now.", 10, 20, 20, WHITE);
+    f32 center_x = gamestate->screen_width * 0.5f;
+    f32 button_center_x = (gamestate->screen_width - button_width) * 0.5f;
+    f32 total_height = button_height + button_spacing;
+    f32 start_y = (gamestate->screen_height - total_height) * 0.5f;
+
+    const char *text = "Yep, thats all levels..";
+    f32 font_size = 40;
+    f32 text_width = MeasureText(text, font_size);
+    DrawText(text, center_x - text_width*0.5f, start_y - button_width, font_size, WHITE);
 
     Button exit_button =
     {
-        .pos = (v2){ 10, 50 },
+        .pos = (v2){ button_center_x, start_y },
         .text = "MAIN MENU",
         .width = 150,
         .height = 50,
