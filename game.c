@@ -98,13 +98,27 @@ UpdateGame(GameState *gamestate, f32 dt)
     if(collision_result_x.overlapping)
     {
         Entity *e = collision_result_x.collided_entity;
-        HandleOverlappingCollision(gamestate, map, collision_result_x.collided_entity);
+        if(e)
+        {
+            if(!e->collision_handled_in_this_frame)
+            {
+                HandleOverlappingCollision(gamestate, map, collision_result_x.collided_entity);
+            }
+            else 
+            {
+                // @Hack ... dont trigger some overlaps twice
+                e->collision_handled_in_this_frame = false;
+            }
+        }
     }
 
     if(collision_result_y.overlapping)
     {
         Entity *e = collision_result_y.collided_entity;
-        HandleOverlappingCollision(gamestate, map, collision_result_y.collided_entity);
+        if(e && !e->collision_handled_in_this_frame)
+        {
+            HandleOverlappingCollision(gamestate, map, collision_result_y.collided_entity);
+        }
     }
 
     player->sprite.pos = player->pos;

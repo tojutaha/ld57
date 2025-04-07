@@ -119,79 +119,88 @@ CheckCollision(Tilemap *map, Entity *player, v2 *velocity, Axis axis)
 function void
 HandleOverlappingCollision(GameState *gamestate, Tilemap *map, Entity *e)
 {
-    if(e)
+    switch(e->type)
     {
-        switch(e->type)
+        case PressurePlate:
         {
-            case PressurePlate:
+            if(gamestate->plate_sequence.sequence_len > 0)
             {
-                if(gamestate->plate_sequence.sequence_len > 0)
+                if(!e->activated)
                 {
-                    if(!e->activated)
+                    e->activated = true;
+                    e->collision_flag = CollisionFlag_None;
+
+                    // Check sequence
+                    PlateSequence *seq = &gamestate->plate_sequence;
+
+                    if(seq->sequence_failed || seq->sequence_completed)
+                        return;
+
+                    if(e->plate_color == seq->color_sequence[seq->current_index])
                     {
-                        e->activated = true;
-                        e->collision_flag = CollisionFlag_None;
+                        seq->current_index++;
 
-                        // Check sequence
-                        PlateSequence *seq = &gamestate->plate_sequence;
-
-                        if(seq->sequence_failed || seq->sequence_completed)
-                            return;
-
-                        if(e->plate_color == seq->color_sequence[seq->current_index])
+                        if(seq->current_index >= seq->sequence_len)
                         {
-                            seq->current_index++;
-
-                            if(seq->current_index >= seq->sequence_len)
-                            {
-                                // Success
-                                seq->sequence_completed = true;
-                                PlaySound(gamestate->door1);
-                            }
-                            else
-                            {
-                                // Correct step
-                                PlaySound(gamestate->blip1);
-                            }
+                            // Success
+                            seq->sequence_completed = true;
+                            PlaySound(gamestate->door1);
                         }
                         else
                         {
-                            // Failure
-                            if(seq->current_index > 0)
-                                PlaySound(gamestate->door2);
-
-                            ResetPlates(map);
-                            seq->sequence_failed = false;
-                            seq->current_index = 0;
+                            // Correct step
+                            PlaySound(gamestate->blip1);
                         }
                     }
-                }
-                else
-                {
-                    // Only clone can trigger blue plates..
-                    if(e->plate_color == PlateColor_Blue)
+                    else
                     {
-                        return;
-                    }
+                        // Failure
+                        if(seq->current_index > 0)
+                            PlaySound(gamestate->door2);
 
-                    if(!e->activated)
-                    {
-                        e->activated = true;
-                        e->collision_flag = CollisionFlag_None;
-                        PlaySound(gamestate->blip1);
+                        ResetPlates(map);
+                        seq->sequence_failed = false;
+                        seq->current_index = 0;
                     }
                 }
-            } break;
-
-            case Door:
+            }
+            else
             {
-                e->collision_flag = CollisionFlag_None;
-                e->type = None;
-                IncrementLevel(gamestate);
+                // Only clone can trigger blue plates..
+                if(e->plate_color == PlateColor_Blue)
+                {
+                    return;
+                }
 
-            } break;
+                if(!e->activated)
+                {
+                    e->activated = true;
+                    e->collision_flag = CollisionFlag_None;
+                    PlaySound(gamestate->blip1);
+                }
+            }
+        } break;
 
-            default: break;
-        }
+        case Door:
+        {
+            e->collision_flag = CollisionFlag_None;
+            e->type = None;
+            IncrementLevel(gamestate);
+
+        } break;
+
+        case BeamEmitter:
+        {
+            if(!e->activated)
+            {
+                e->collision_handled_in_this_frame = true;
+                if(IsKeyPressed(KEY_E))
+                {
+                    e->dir = (Direction)((e->dir + 1) % 4);
+                }
+            }
+        } break;
+
+        default: break;
     }
 }

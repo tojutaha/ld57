@@ -9,7 +9,7 @@ IsAllEntitiesActivated(Tilemap *map)
     for(u32 i = 0; i < map->entity_count; ++i)
     {
         Entity *e = &map->entities[i];
-        if(e->type == PressurePlate && !e->activated)
+        if((e->type == PressurePlate || e->type == BeamEmitter) && !e->activated)
         {
             result = false;
             break;
@@ -175,6 +175,75 @@ UpdateAndDrawMapAndEntities(GameState *gamestate, Tilemap *map, f32 dt)
                 DrawSprite(gamestate->texture_atlas, e->sprite, PLAYER_WIDTH, PLAYER_HEIGHT);
             } break;
 
+            case BeamEmitter:
+            {
+                // Draw beam
+                v2 start = e->pos;
+                // Center it
+                start.x += TILE_WIDTH * 0.5f;
+                start.y += TILE_HEIGHT * 0.5f;
+                v2 dir_vec = {0};
+                switch(e->dir)
+                {
+                    case Left:
+                    {
+                        dir_vec = (v2){-1, 0 };
+                    } break;
+                    case Right:
+                    {
+                        dir_vec = (v2){ 1, 0 };
+                    } break;
+                    case Up:
+                    {
+                        dir_vec = (v2){ 0,-1 };
+                    } break;
+                    case Down:
+                    {
+                        dir_vec = (v2){ 0, 1 };
+                    } break;
+                }
+
+                v2 current = start;
+                f32 step = 8.0f;
+                v2 end = start;
+
+                for(u32 i = 0; i < 100; ++i)
+                {
+                    current.x += dir_vec.x * step;
+                    current.y += dir_vec.y * step;
+
+                    for(u32 j = 0; j < map->entity_count; ++j)
+                    {
+                        Entity *entity = &map->entities[j];
+                        Rectangle entity_rect = { entity->pos.x, entity->pos.y, TILE_WIDTH, TILE_HEIGHT };
+
+                        if(entity->type == Wall)
+                        {
+                            if(CheckCollisionPointRec(current, entity_rect))
+                                goto done;
+                        }
+                        else if(entity->type == Door)
+                        {
+                            if(CheckCollisionPointRec(current, entity_rect))
+                            {
+                                map->door_open = true;
+                                e->activated = true;
+                                goto done;
+                            }
+                        }
+                    }
+                }
+
+done:
+                end = current;
+                DrawLineEx(start, end, 4.0f, YELLOW);
+
+                // TODO: Change to sprite
+                Rectangle rect = { e->pos.x, e->pos.y, TILE_WIDTH, TILE_HEIGHT };
+                DrawRectangleRec(rect, RED);
+
+            } break;
+
             default: break;
         }
     }
@@ -247,6 +316,11 @@ SetupLevel(GameState *gamestate, u32 level_num)
         {
             // Default first level; Learn about the plates and door
             AddPressurePlate(&gamestate->current_map, 2, 1, PlateColor_Green);
+
+            // AddBeamEmitter(&gamestate->current_map, 6, 5, Left);
+            // AddBeamEmitter(&gamestate->current_map, 5, 5, Down);
+            // AddBeamEmitter(&gamestate->current_map, 5, 5, Left);
+            // AddBeamEmitter(&gamestate->current_map, 5, 5, Right);
 
             return true;
         }

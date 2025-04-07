@@ -31,13 +31,16 @@ typedef enum
     Wall,
     PressurePlate,
     Clone,
+
+    BeamEmitter,
+    Mirror,
 } EntityType;
 
 typedef enum
 {
-    Left,
-    Right,
+    Left = 0,
     Up,
+    Right,
     Down
 } Direction;
 
@@ -62,5 +65,7 @@ typedef struct
     f32 deactivation_time;
 
     f32 alpha;
+
+    b32 collision_handled_in_this_frame;
 } Entity;
 
